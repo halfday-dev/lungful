@@ -1,0 +1,3 @@
+module Lungful {
+    header "/Users/hexagent/.openclaw/workspace/lungful/.build/arm64-apple-macosx/debug/Lungful.build/include/Lungful-Swift.h"
+}
