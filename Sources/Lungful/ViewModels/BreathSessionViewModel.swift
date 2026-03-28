@@ -17,6 +17,7 @@ public final class BreathSessionViewModel: ObservableObject {
     @Published public private(set) var isRunning: Bool = false
     @Published public private(set) var isComplete: Bool = false
     @Published public private(set) var isPaused: Bool = false
+    @Published public private(set) var isCompletionAnimating: Bool = false
 
     /// Scale value for the breath circle (0.35 → 1.0), computed each frame.
     @Published public private(set) var circleScale: CGFloat = 0.35
@@ -113,10 +114,11 @@ public final class BreathSessionViewModel: ObservableObject {
             let progress = min(elapsed / currentPhaseDuration, 1.0)
             phaseProgress = progress
 
-            // Interpolate circle scale
+            // Interpolate circle scale with eased progress for organic feel
             let startScale = scaleForPhase(previousPhase(before: currentPhase))
             let endScale = scaleForPhase(currentPhase)
-            circleScale = startScale + (endScale - startScale) * progress
+            let easedProgress = easeBreath(progress)
+            circleScale = startScale + (endScale - startScale) * easedProgress
 
             if progress >= 1.0 {
                 // Advance with the exact end time of this phase for accurate chaining
@@ -181,6 +183,7 @@ public final class BreathSessionViewModel: ObservableObject {
                 phaseProgress = 1.0
                 phaseTimeRemaining = 0
                 isRunning = false
+                isCompletionAnimating = true
                 isComplete = true
                 stopTimer()
                 playCompletionHaptic()
@@ -194,9 +197,22 @@ public final class BreathSessionViewModel: ObservableObject {
         phaseTimeRemaining = 0
         currentCycle = 1
         isComplete = false
+        isCompletionAnimating = false
         isPaused = false
         circleScale = 0.35
         pauseElapsed = 0
+    }
+
+    // MARK: - Easing
+
+    /// Asymmetric ease for organic breath feel: slow start, smooth acceleration, gentle landing.
+    /// First half is quadratic ease-in, second half is quadratic ease-out.
+    private func easeBreath(_ t: Double) -> Double {
+        if t < 0.5 {
+            return 2 * t * t
+        } else {
+            return 1 - pow(-2 * t + 2, 2) / 2
+        }
     }
 
     // MARK: - Scale Helpers

@@ -4,6 +4,7 @@ import SwiftUI
 public struct BreathSessionView: View {
     @StateObject private var viewModel: BreathSessionViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var showCompletionControls: Bool = false
 
     private let pattern: BreathPattern
 
@@ -18,17 +19,18 @@ public struct BreathSessionView: View {
             Theme.deepStone
                 .ignoresSafeArea()
 
-            // DR-7: Subtle phase-colored tint overlay
+            // DR-7: Subtle phase-colored tint overlay — fades to neutral on completion
             Rectangle()
-                .fill(phaseColor.opacity(0.03))
+                .fill(viewModel.isComplete ? Color.clear : phaseColor.opacity(0.03))
                 .ignoresSafeArea()
                 .animation(.easeInOut(duration: 2.0), value: viewModel.currentPhase)
+                .animation(.easeInOut(duration: 1.5), value: viewModel.isComplete)
 
             VStack(spacing: 0) {
                 // DR-5: Cycle count at the very top of the screen
                 if viewModel.isRunning || viewModel.isComplete {
                     Text("\(viewModel.currentCycle) of \(viewModel.totalCycles)")
-                        .font(.system(size: 13, weight: .regular, design: .rounded))
+                        .font(.system(size: 13, weight: .regular, design: .default))
                         .foregroundStyle(Theme.shadow)
                         .padding(.top, 16)
                 } else {
@@ -47,7 +49,7 @@ public struct BreathSessionView: View {
                 // Pattern info
                 VStack(spacing: 4) {
                     Text(pattern.name)
-                        .font(.system(size: 20, weight: .medium, design: .rounded))
+                        .font(.system(size: 20, weight: .medium, design: .default))
                         .foregroundStyle(Theme.bone.opacity(0.8))
 
                     Text(phaseSummary)
@@ -59,6 +61,19 @@ public struct BreathSessionView: View {
                 // DR-6: Text-only controls
                 sessionControls
                     .padding(.bottom, 60)
+            }
+        }
+        .onChange(of: viewModel.isComplete) { _, complete in
+            if complete {
+                showCompletionControls = false
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(2))
+                    withAnimation(.easeInOut(duration: 0.6)) {
+                        showCompletionControls = true
+                    }
+                }
+            } else {
+                showCompletionControls = false
             }
         }
         .navigationBarBackButtonHidden(viewModel.isRunning)
@@ -86,21 +101,24 @@ public struct BreathSessionView: View {
 
                 Button("End") { viewModel.stop() }
                     .foregroundStyle(Theme.dust)
-            } else if viewModel.isComplete {
-                // Complete
+            } else if viewModel.isComplete && showCompletionControls {
+                // Complete — delayed fade-in after moment of stillness
                 Button("Again") { viewModel.start() }
                     .foregroundStyle(Theme.ochre)
 
                 Button("Done") { dismiss() }
                     .foregroundStyle(Theme.dust)
+            } else if viewModel.isComplete {
+                // Completion animating — moment of stillness, no controls
+                Color.clear.frame(height: 20)
             } else {
                 // Pre-session
                 Button("Begin") { viewModel.start() }
-                    .font(.system(size: 20, weight: .medium, design: .rounded))
+                    .font(.system(size: 20, weight: .medium, design: .default))
                     .foregroundStyle(Theme.ochre)
             }
         }
-        .font(.system(size: 17, weight: .regular, design: .rounded))
+        .font(.system(size: 17, weight: .regular, design: .default))
         .buttonStyle(.plain)
     }
 

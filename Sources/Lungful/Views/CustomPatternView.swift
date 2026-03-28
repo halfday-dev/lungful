@@ -56,7 +56,7 @@ public struct CustomPatternView: View {
                     // Cycles — discrete stepper control
                     HStack {
                         Text("Cycles")
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .font(.system(size: 16, weight: .medium, design: .default))
                             .foregroundStyle(Theme.dust)
 
                         Spacer()
@@ -64,19 +64,19 @@ public struct CustomPatternView: View {
                         HStack(spacing: 20) {
                             Button(action: { if cycles > 1 { cycles -= 1 } }) {
                                 Text("\u{2212}")
-                                    .font(.system(size: 22, weight: .regular, design: .rounded))
+                                    .font(.system(size: 22, weight: .regular, design: .default))
                                     .foregroundStyle(cycles > 1 ? Theme.dust : Theme.shadow)
                             }
                             .disabled(cycles <= 1)
 
                             Text("\(cycles)")
-                                .font(.system(size: 24, weight: .semibold, design: .rounded))
+                                .font(.system(size: 24, weight: .semibold, design: .default))
                                 .foregroundStyle(Theme.bone)
                                 .frame(minWidth: 44, alignment: .center)
 
                             Button(action: { if cycles < 60 { cycles += 1 } }) {
                                 Text("+")
-                                    .font(.system(size: 22, weight: .regular, design: .rounded))
+                                    .font(.system(size: 22, weight: .regular, design: .default))
                                     .foregroundStyle(cycles < 60 ? Theme.dust : Theme.shadow)
                             }
                             .disabled(cycles >= 60)
@@ -92,7 +92,7 @@ public struct CustomPatternView: View {
                     // Start button — solid ochre fill, black text, no gradient
                     NavigationLink(value: buildPattern()) {
                         Text("Start")
-                            .font(.system(size: 20, weight: .semibold, design: .rounded))
+                            .font(.system(size: 20, weight: .semibold, design: .default))
                             .foregroundStyle(.black)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
@@ -186,18 +186,18 @@ private struct PhaseRow: View {
                     .frame(width: 8, height: 8)
 
                 Text(label)
-                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                    .font(.system(size: 16, weight: .medium, design: .default))
                     .foregroundStyle(Theme.dust)
 
                 Spacer()
 
                 Text(formattedValue)
-                    .font(.system(size: 24, weight: .semibold, design: .rounded))
+                    .font(.system(size: 24, weight: .semibold, design: .default))
                     .foregroundStyle(Theme.bone)
                     .frame(minWidth: 44, alignment: .trailing)
 
                 Text("s")
-                    .font(.system(size: 14, weight: .regular, design: .rounded))
+                    .font(.system(size: 14, weight: .regular, design: .default))
                     .foregroundStyle(Theme.shadow)
             }
 
