@@ -21,6 +21,9 @@ public final class BreathSessionViewModel: ObservableObject {
     /// Scale value for the breath circle (0.35 → 1.0), computed each frame.
     @Published public private(set) var circleScale: CGFloat = 0.35
 
+    /// Seconds remaining in the current phase, updated each frame.
+    @Published public private(set) var phaseTimeRemaining: TimeInterval = 0
+
     // MARK: - Configuration
 
     public let pattern: BreathPattern
@@ -106,6 +109,7 @@ public final class BreathSessionViewModel: ObservableObject {
             }
 
             let elapsed = date.timeIntervalSince(phaseStartDate)
+            phaseTimeRemaining = max(0, currentPhaseDuration - elapsed)
             let progress = min(elapsed / currentPhaseDuration, 1.0)
             phaseProgress = progress
 
@@ -133,6 +137,7 @@ public final class BreathSessionViewModel: ObservableObject {
         currentPhase = phase
         currentPhaseDuration = pattern.duration(for: phase)
         phaseProgress = 0.0
+        phaseTimeRemaining = currentPhaseDuration
         phaseStartDate = date
         pauseElapsed = 0
         playPhaseHaptic(phase)
@@ -142,13 +147,24 @@ public final class BreathSessionViewModel: ObservableObject {
 
     private func playPhaseHaptic(_ phase: BreathPhase) {
         #if canImport(UIKit) && !os(macOS)
-        let style: UIImpactFeedbackGenerator.FeedbackStyle = switch phase {
-        case .inhale:  .medium
-        case .holdIn:  .light
-        case .exhale:  .medium
-        case .holdOut: .light
+        switch phase {
+        case .inhale:
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        case .holdIn:
+            UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+        case .exhale:
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        case .holdOut:
+            // Silence IS the experience — no haptic for hold-out.
+            break
         }
-        UIImpactFeedbackGenerator(style: style).impactOccurred()
+        #endif
+    }
+
+    /// Fire a completion haptic when session ends.
+    private func playCompletionHaptic() {
+        #if canImport(UIKit) && !os(macOS)
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
         #endif
     }
 
@@ -163,9 +179,11 @@ public final class BreathSessionViewModel: ObservableObject {
             } else {
                 // Session complete
                 phaseProgress = 1.0
+                phaseTimeRemaining = 0
                 isRunning = false
                 isComplete = true
                 stopTimer()
+                playCompletionHaptic()
             }
         }
     }
@@ -173,6 +191,7 @@ public final class BreathSessionViewModel: ObservableObject {
     private func reset() {
         currentPhase = pattern.activePhases.first ?? .inhale
         phaseProgress = 0.0
+        phaseTimeRemaining = 0
         currentCycle = 1
         isComplete = false
         isPaused = false

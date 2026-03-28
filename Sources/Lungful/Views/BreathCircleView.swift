@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// The breathing circle — expands on inhale, contracts on exhale.
-/// Uses a Timer to drive updates outside of view body evaluation.
+/// Clean flat circle + thin stroke + subtle depth ring. Warm watercolor feel.
 public struct BreathCircleView: View {
     @ObservedObject var viewModel: BreathSessionViewModel
 
@@ -16,52 +16,50 @@ public struct BreathCircleView: View {
             let baseSize = min(max(available * 0.45, minSize), maxSize)
 
             ZStack {
-                // Outer glow
+                // Subtle depth ring
                 Circle()
-                    .fill(phaseColor.opacity(0.15))
-                    .frame(width: baseSize * 1.14, height: baseSize * 1.14)
+                    .strokeBorder(phaseColor.opacity(0.2), lineWidth: 2)
+                    .frame(width: baseSize * 0.97, height: baseSize * 0.97)
                     .scaleEffect(viewModel.circleScale)
-                    .blur(radius: 30)
 
-                // Main circle
+                // Main circle — flat fill + thin stroke overlay
                 Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [phaseColor.opacity(0.8), phaseColor.opacity(0.3)],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: baseSize / 2
-                        )
+                    .fill(phaseColor.opacity(0.4))
+                    .overlay(
+                        Circle()
+                            .strokeBorder(phaseColor.opacity(0.6), lineWidth: 1.5)
                     )
                     .frame(width: baseSize, height: baseSize)
                     .scaleEffect(viewModel.circleScale)
 
-                // Inner ring
-                Circle()
-                    .strokeBorder(phaseColor.opacity(0.6), lineWidth: 2)
-                    .frame(width: baseSize * 0.93, height: baseSize * 0.93)
-                    .scaleEffect(viewModel.circleScale)
-
-                // Phase label + cycle count
-                VStack(spacing: 8) {
-                    Text(viewModel.currentPhase.label)
-                        .font(.system(size: 32, weight: .light, design: .rounded))
-                        .foregroundStyle(Theme.bone)
-                        .contentTransition(.numericText())
-                        .accessibilityLabel(viewModel.currentPhase.accessibilityLabel)
-
-                    if viewModel.isRunning || viewModel.isComplete {
-                        Text("\(viewModel.currentCycle) of \(viewModel.totalCycles)")
-                            .font(.system(size: 16, weight: .regular, design: .rounded))
-                            .foregroundStyle(Theme.dust)
-                    }
-                }
+                // Phase label + countdown
+                phaseLabels
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
             // DR-2: No animation on circleScale — the 30fps timer interpolation
             // provides smooth animation at the pace of the actual breath phase.
             // Only animate phase color transitions with a 0.8s cross-fade.
             .animation(.easeInOut(duration: 0.8), value: viewModel.currentPhase)
+        }
+    }
+
+    @ViewBuilder
+    private var phaseLabels: some View {
+        VStack(spacing: 6) {
+            Text(viewModel.currentPhase.label)
+                .font(.system(size: 38, weight: .ultraLight, design: .default))
+                .foregroundStyle(Theme.bone)
+                .contentTransition(.numericText())
+                .accessibilityLabel(viewModel.currentPhase.accessibilityLabel)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+
+            if viewModel.isRunning && !viewModel.isPaused {
+                Text(String(format: "%.1f", viewModel.phaseTimeRemaining))
+                    .font(.system(size: 16, weight: .light, design: .monospaced))
+                    .foregroundStyle(Theme.dust)
+                    .contentTransition(.numericText())
+                    .monospacedDigit()
+            }
         }
     }
 
