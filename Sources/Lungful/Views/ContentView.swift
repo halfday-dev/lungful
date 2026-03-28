@@ -7,7 +7,6 @@ public struct ContentView: View {
     public var body: some View {
         NavigationStack {
             PatternListView()
-                .navigationTitle("Lungful")
                 #if !os(macOS)
                 .toolbarColorScheme(.dark, for: .navigationBar)
                 #endif
