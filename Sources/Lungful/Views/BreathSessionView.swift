@@ -14,11 +14,27 @@ public struct BreathSessionView: View {
 
     public var body: some View {
         ZStack {
-            // Background
+            // Background — deep stone base
             Theme.deepStone
                 .ignoresSafeArea()
 
+            // DR-7: Subtle phase-colored tint overlay
+            Rectangle()
+                .fill(phaseColor.opacity(0.03))
+                .ignoresSafeArea()
+                .animation(.easeInOut(duration: 2.0), value: viewModel.currentPhase)
+
             VStack(spacing: 0) {
+                // DR-5: Cycle count at the very top of the screen
+                if viewModel.isRunning || viewModel.isComplete {
+                    Text("\(viewModel.currentCycle) of \(viewModel.totalCycles)")
+                        .font(.system(size: 13, weight: .regular, design: .rounded))
+                        .foregroundStyle(Theme.shadow)
+                        .padding(.top, 16)
+                } else {
+                    Spacer().frame(height: 32)
+                }
+
                 Spacer()
 
                 // Breath circle
@@ -40,45 +56,59 @@ public struct BreathSessionView: View {
                 }
                 .padding(.bottom, 32)
 
-                // Controls
-                HStack(spacing: 40) {
-                    if viewModel.isRunning && viewModel.isPaused {
-                        Button(action: { viewModel.resume() }) {
-                            controlIcon("play.fill")
-                        }
-
-                        Button(action: { viewModel.stop() }) {
-                            controlIcon("stop.fill")
-                        }
-                    } else if viewModel.isRunning {
-                        Button(action: { viewModel.pause() }) {
-                            controlIcon("pause.fill")
-                        }
-
-                        Button(action: { viewModel.stop() }) {
-                            controlIcon("stop.fill")
-                        }
-                    } else if viewModel.isComplete {
-                        Button(action: { viewModel.start() }) {
-                            controlIcon("arrow.counterclockwise")
-                        }
-
-                        Button(action: { dismiss() }) {
-                            controlIcon("xmark")
-                        }
-                    } else {
-                        Button(action: { viewModel.start() }) {
-                            controlIcon("play.fill")
-                        }
-                    }
-                }
-                .padding(.bottom, 60)
+                // DR-6: Text-only controls
+                sessionControls
+                    .padding(.bottom, 60)
             }
         }
         .navigationBarBackButtonHidden(viewModel.isRunning)
         #if !os(macOS)
         .statusBarHidden(viewModel.isRunning)
         #endif
+    }
+
+    // MARK: - Controls
+
+    @ViewBuilder
+    private var sessionControls: some View {
+        HStack(spacing: 40) {
+            if viewModel.isRunning && viewModel.isPaused {
+                // Paused
+                Button("Resume") { viewModel.resume() }
+                    .foregroundStyle(Theme.dust)
+
+                Button("End") { viewModel.stop() }
+                    .foregroundStyle(Theme.dust)
+            } else if viewModel.isRunning {
+                // Running
+                Button("Pause") { viewModel.pause() }
+                    .foregroundStyle(Theme.dust)
+
+                Button("End") { viewModel.stop() }
+                    .foregroundStyle(Theme.dust)
+            } else if viewModel.isComplete {
+                // Complete
+                Button("Again") { viewModel.start() }
+                    .foregroundStyle(Theme.ochre)
+
+                Button("Done") { dismiss() }
+                    .foregroundStyle(Theme.dust)
+            } else {
+                // Pre-session
+                Button("Begin") { viewModel.start() }
+                    .font(.system(size: 20, weight: .medium, design: .rounded))
+                    .foregroundStyle(Theme.ochre)
+            }
+        }
+        .font(.system(size: 17, weight: .regular, design: .rounded))
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Helpers
+
+    /// Phase color for background tint.
+    private var phaseColor: Color {
+        Theme.color(for: viewModel.currentPhase)
     }
 
     private var phaseSummary: String {
@@ -98,13 +128,5 @@ public struct BreathSessionView: View {
         value.truncatingRemainder(dividingBy: 1) == 0
             ? String(format: "%.0f", value)
             : String(format: "%.1f", value)
-    }
-
-    private func controlIcon(_ systemName: String) -> some View {
-        Image(systemName: systemName)
-            .font(.system(size: 28, weight: .medium))
-            .foregroundStyle(Theme.bone)
-            .frame(width: 64, height: 64)
-            .background(Circle().fill(Theme.kilnEdge))
     }
 }
