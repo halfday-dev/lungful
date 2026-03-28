@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!--
+    Lungful Breath Ring — Concept B
+    Mono version: bone (#E8E0D4) on transparent
+    Nearly-complete circle, gap ~35deg at 12 o'clock.
+    Variable thickness: 6.5px at bottom, 1.8px at gap edges.
+    Center 50,50. Outer R=38. Inner R varies 31.5 to 36.2.
+    23 points per contour at 15-degree spacing.
+    Outer arc CW from 287.5 to 252.5 (the long way around).
+    Inner arc CCW (reversed) back to start.
+  -->
+  <path d="
+    M 61.43 13.76
+    L 69.00 17.09
+    L 76.87 23.13
+    L 82.91 31.00
+    L 86.70 40.17
+    L 88.00 50.00
+    L 86.70 59.83
+    L 82.91 69.00
+    L 76.87 76.87
+    L 69.00 82.91
+    L 59.83 86.70
+    L 50.00 88.00
+    L 40.17 86.70
+    L 31.00 82.91
+    L 23.13 76.87
+    L 17.09 69.00
+    L 13.30 59.83
+    L 12.00 50.00
+    L 13.30 40.17
+    L 17.09 31.00
+    L 23.13 23.13
+    L 31.00 17.09
+    L 38.57 13.76
+    L 39.12 15.52
+    L 31.97 18.77
+    L 24.61 24.61
+    L 19.10 32.16
+    L 15.82 40.84
+    L 14.97 50.00
+    L 16.58 58.95
+    L 20.46 67.06
+    L 26.27 73.73
+    L 33.53 78.52
+    L 41.65 81.15
+    L 50.00 81.50
+    L 58.35 81.15
+    L 66.47 78.52
+    L 73.73 73.73
+    L 79.54 67.06
+    L 83.42 58.95
+    L 85.03 50.00
+    L 84.18 40.84
+    L 80.90 32.16
+    L 75.39 24.61
+    L 68.03 18.77
+    L 60.88 15.52
+    Z
+  " fill="#E8E0D4"/>
+</svg>

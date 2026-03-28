@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!--
+    Lungful App Icon
+    Deep stone background with bone breath ring centered.
+    Apple applies the squircle mask at export time.
+    Ring fills ~60% of the icon area (diameter ~614px).
+    Geometry scaled from 100x100 breath-ring.svg: multiply all coords by 10.24, center at 512,512.
+
+    Scale factor: icon center = 512. Ring was centered at 50 in 100-unit space.
+    New center: 512. Scale: 614/76 = 8.079 (76 = outer diameter in 100-unit space).
+    Actually: outer radius in original = 38, so diameter = 76.
+    Target diameter = 614 (60% of 1024). Scale = 614/76 = 8.079.
+    Offset: center goes from 50 to 512, so shift = 512 - 50*8.079 = 512 - 403.95 = 108.05.
+    New coords: x_new = x_old * 8.079 + 108.05, y_new = y_old * 8.079 + 108.05.
+
+    Precomputed points below.
+  -->
+
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="#1A1714" rx="0" ry="0"/>
+
+  <!-- Breath Ring -->
+  <path d="
+    M 604.36 219.20
+    L 665.55 246.12
+    L 729.22 295.00
+    L 777.89 358.44
+    L 808.52 432.68
+    L 819.03 512.00
+    L 808.52 591.32
+    L 777.89 665.56
+    L 729.22 729.00
+    L 665.55 777.88
+    L 591.33 808.30
+    L 512.00 818.81
+    L 432.67 808.30
+    L 358.45 777.88
+    L 294.99 729.00
+    L 246.11 665.56
+    L 215.48 591.32
+    L 204.97 512.00
+    L 215.48 432.68
+    L 246.11 358.44
+    L 294.99 295.00
+    L 358.45 246.12
+    L 419.64 219.20
+    L 424.08 233.43
+    L 366.28 259.70
+    L 306.93 306.93
+    L 262.29 367.86
+    L 235.78 437.91
+    L 228.91 512.00
+    L 241.91 584.28
+    L 273.24 649.84
+    L 320.17 703.73
+    L 378.86 742.43
+    L 444.52 766.69
+    L 512.00 766.52
+    L 579.48 766.69
+    L 645.14 742.43
+    L 703.83 703.73
+    L 750.76 649.84
+    L 782.09 584.28
+    L 795.09 512.00
+    L 788.22 437.91
+    L 761.72 367.86
+    L 717.07 306.93
+    L 657.72 259.70
+    L 599.92 233.43
+    Z
+  " fill="#E8E0D4"/>
+</svg>
