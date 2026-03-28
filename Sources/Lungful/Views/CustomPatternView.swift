@@ -17,7 +17,17 @@ public struct CustomPatternView: View {
 
             ScrollView {
                 VStack(spacing: 32) {
-                    VStack(spacing: 24) {
+                    // Live preview circle
+                    PreviewCircleView(
+                        inhaleDuration: inhaleDuration,
+                        holdInDuration: holdInDuration,
+                        exhaleDuration: exhaleDuration,
+                        holdOutDuration: holdOutDuration
+                    )
+                    .frame(height: 140)
+
+                    // Phase rows — no card backgrounds, generous spacing
+                    VStack(spacing: 32) {
                         PhaseRow(
                             label: "Inhale",
                             value: $inhaleDuration,
@@ -43,77 +53,41 @@ public struct CustomPatternView: View {
                         )
                     }
 
-                    // Cycles
-                    VStack(spacing: 8) {
-                        HStack {
-                            Text("Cycles")
-                                .font(.system(size: 16, weight: .medium, design: .rounded))
-                                .foregroundStyle(Theme.dust)
+                    // Cycles — discrete stepper control
+                    HStack {
+                        Text("Cycles")
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .foregroundStyle(Theme.dust)
 
-                            Spacer()
+                        Spacer()
 
-                            Text("\(cycles)")
-                                .font(.system(size: 24, weight: .semibold, design: .rounded))
-                                .foregroundStyle(Theme.bone)
-                                .frame(minWidth: 44, alignment: .trailing)
-                        }
-
-                        HStack(spacing: 16) {
+                        HStack(spacing: 20) {
                             Button(action: { if cycles > 1 { cycles -= 1 } }) {
-                                Image(systemName: "minus.circle.fill")
-                                    .font(.system(size: 24))
+                                Text("\u{2212}")
+                                    .font(.system(size: 22, weight: .regular, design: .rounded))
                                     .foregroundStyle(cycles > 1 ? Theme.dust : Theme.shadow)
                             }
                             .disabled(cycles <= 1)
 
-                            Slider(
-                                value: Binding(
-                                    get: { Double(cycles) },
-                                    set: { cycles = Int($0) }
-                                ),
-                                in: 1...60,
-                                step: 1
-                            )
-                            .tint(Theme.ochre)
+                            Text("\(cycles)")
+                                .font(.system(size: 24, weight: .semibold, design: .rounded))
+                                .foregroundStyle(Theme.bone)
+                                .frame(minWidth: 44, alignment: .center)
 
                             Button(action: { if cycles < 60 { cycles += 1 } }) {
-                                Image(systemName: "plus.circle.fill")
-                                    .font(.system(size: 24))
+                                Text("+")
+                                    .font(.system(size: 22, weight: .regular, design: .rounded))
                                     .foregroundStyle(cycles < 60 ? Theme.dust : Theme.shadow)
                             }
                             .disabled(cycles >= 60)
                         }
                     }
-                    .padding(20)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(Theme.warmClay)
-                            .strokeBorder(Theme.kilnEdge, lineWidth: 1)
-                    )
 
-                    // Session summary
-                    HStack(spacing: 24) {
-                        SummaryItem(
-                            icon: "clock",
-                            label: formattedDuration(totalDuration)
-                        )
-
-                        SummaryItem(
-                            icon: "repeat",
-                            label: "\(cycles) cycles"
-                        )
-
-                        SummaryItem(
-                            icon: "lungs",
-                            label: phaseSummary
-                        )
-                    }
-                    .padding(16)
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(Theme.warmClay.opacity(0.6))
-                    )
+                    // Summary line
+                    Text(summaryLine)
+                        .font(.system(size: 13, weight: .light, design: .monospaced))
+                        .foregroundStyle(Theme.dust)
+                        .frame(maxWidth: .infinity, alignment: .center)
 
                     // Start button — solid ochre fill, black text, no gradient
                     NavigationLink(value: buildPattern()) {
@@ -157,17 +131,16 @@ public struct CustomPatternView: View {
         cycleDuration * Double(cycles)
     }
 
-    private var phaseSummary: String {
-        let parts = [
-            ("In", inhaleDuration),
-            ("Hold", holdInDuration),
-            ("Out", exhaleDuration),
-            ("Hold", holdOutDuration)
-        ]
-        .filter { $0.1 > 0 }
-        .map { "\($0.0) \(formatted($0.1))" }
+    /// Compact phase summary like "4-0-4-0"
+    private var compactPhaseSummary: String {
+        [inhaleDuration, holdInDuration, exhaleDuration, holdOutDuration]
+            .map { formatted($0) }
+            .joined(separator: "-")
+    }
 
-        return parts.joined(separator: "-")
+    /// Single summary line: "6 cycles · 48s · 4-0-4-0"
+    private var summaryLine: String {
+        "\(cycles) cycles \u{00B7} \(formattedDuration(totalDuration)) \u{00B7} \(compactPhaseSummary)"
     }
 
     private func buildPattern() -> BreathPattern {
@@ -199,6 +172,7 @@ public struct CustomPatternView: View {
 
 // MARK: - Phase Row
 
+/// Minimal phase control: colored dot, label, value, and slider. No card background.
 private struct PhaseRow: View {
     let label: String
     @Binding var value: Double
@@ -209,7 +183,7 @@ private struct PhaseRow: View {
             HStack {
                 Circle()
                     .fill(color)
-                    .frame(width: 10, height: 10)
+                    .frame(width: 8, height: 8)
 
                 Text(label)
                     .font(.system(size: 16, weight: .medium, design: .rounded))
@@ -227,31 +201,9 @@ private struct PhaseRow: View {
                     .foregroundStyle(Theme.shadow)
             }
 
-            HStack(spacing: 16) {
-                Button(action: { if value > 0 { value = max(0, value - 0.5) } }) {
-                    Image(systemName: "minus.circle.fill")
-                        .font(.system(size: 24))
-                        .foregroundStyle(value > 0 ? Theme.dust : Theme.shadow)
-                }
-                .disabled(value <= 0)
-
-                Slider(value: $value, in: 0...30, step: 0.5)
-                    .tint(color)
-
-                Button(action: { if value < 30 { value = min(30, value + 0.5) } }) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 24))
-                        .foregroundStyle(value < 30 ? Theme.dust : Theme.shadow)
-                }
-                .disabled(value >= 30)
-            }
+            Slider(value: $value, in: 0...30, step: 0.5)
+                .tint(color)
         }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Theme.warmClay)
-                .strokeBorder(color.opacity(0.2), lineWidth: 1)
-        )
     }
 
     private var formattedValue: String {
@@ -261,21 +213,150 @@ private struct PhaseRow: View {
     }
 }
 
-// MARK: - Summary Item
+// MARK: - Preview Circle
 
-private struct SummaryItem: View {
-    let icon: String
-    let label: String
+/// Small animated breath circle that loops through the configured pattern.
+/// Runs its own timer — no BreathSessionViewModel needed.
+private struct PreviewCircleView: View {
+    let inhaleDuration: Double
+    let holdInDuration: Double
+    let exhaleDuration: Double
+    let holdOutDuration: Double
+
+    private let diameter: CGFloat = 120
+
+    @State private var currentPhase: BreathPhase = .inhale
+    @State private var circleScale: CGFloat = 0.4
+    @State private var phaseStartDate: Date = .now
+    @State private var timer: Timer?
 
     var body: some View {
-        VStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(Theme.shadow)
+        ZStack {
+            // Depth ring
+            Circle()
+                .strokeBorder(phaseColor.opacity(0.2), lineWidth: 2)
+                .frame(width: diameter * 0.97, height: diameter * 0.97)
+                .scaleEffect(circleScale)
 
-            Text(label)
-                .font(.system(size: 13, weight: .medium, design: .rounded))
-                .foregroundStyle(Theme.dust)
+            // Main circle — flat fill + thin stroke
+            Circle()
+                .fill(phaseColor.opacity(0.4))
+                .overlay(
+                    Circle()
+                        .strokeBorder(phaseColor.opacity(0.6), lineWidth: 1.5)
+                )
+                .frame(width: diameter, height: diameter)
+                .scaleEffect(circleScale)
         }
+        .animation(.easeInOut(duration: 0.8), value: currentPhase)
+        .onAppear { startAnimation() }
+        .onDisappear { stopAnimation() }
+        .onChange(of: inhaleDuration) { _, _ in restartAnimation() }
+        .onChange(of: holdInDuration) { _, _ in restartAnimation() }
+        .onChange(of: exhaleDuration) { _, _ in restartAnimation() }
+        .onChange(of: holdOutDuration) { _, _ in restartAnimation() }
+    }
+
+    private var phaseColor: Color {
+        Theme.color(for: currentPhase)
+    }
+
+    /// Active phases based on current duration values (skip zero-duration phases).
+    private var activePhases: [BreathPhase] {
+        var phases: [BreathPhase] = []
+        if inhaleDuration > 0 { phases.append(.inhale) }
+        if holdInDuration > 0 { phases.append(.holdIn) }
+        if exhaleDuration > 0 { phases.append(.exhale) }
+        if holdOutDuration > 0 { phases.append(.holdOut) }
+        return phases
+    }
+
+    private func duration(for phase: BreathPhase) -> Double {
+        switch phase {
+        case .inhale:  return inhaleDuration
+        case .holdIn:  return holdInDuration
+        case .exhale:  return exhaleDuration
+        case .holdOut: return holdOutDuration
+        }
+    }
+
+    private func targetScale(for phase: BreathPhase) -> CGFloat {
+        switch phase {
+        case .inhale, .holdIn:  return 1.0
+        case .exhale, .holdOut: return 0.4
+        }
+    }
+
+    private func previousPhaseScale() -> CGFloat {
+        let phases = activePhases
+        guard let idx = phases.firstIndex(of: currentPhase), idx > 0 else {
+            return phases.last.map { targetScale(for: $0) } ?? 0.4
+        }
+        return targetScale(for: phases[idx - 1])
+    }
+
+    private func startAnimation() {
+        let phases = activePhases
+        guard !phases.isEmpty else { return }
+
+        currentPhase = phases[0]
+        phaseStartDate = .now
+        circleScale = previousPhaseScale()
+
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { _ in
+            Task { @MainActor in
+                tick()
+            }
+        }
+    }
+
+    private func stopAnimation() {
+        timer?.invalidate()
+        timer = nil
+    }
+
+    private func restartAnimation() {
+        stopAnimation()
+        startAnimation()
+    }
+
+    private func tick() {
+        let phases = activePhases
+        guard !phases.isEmpty else { return }
+
+        let dur = duration(for: currentPhase)
+        guard dur > 0 else {
+            advancePhase()
+            return
+        }
+
+        let elapsed = Date.now.timeIntervalSince(phaseStartDate)
+        let progress = min(elapsed / dur, 1.0)
+
+        let startScale = previousPhaseScale()
+        let endScale = targetScale(for: currentPhase)
+        circleScale = startScale + (endScale - startScale) * progress
+
+        if progress >= 1.0 {
+            advancePhase()
+        }
+    }
+
+    private func advancePhase() {
+        let phases = activePhases
+        guard !phases.isEmpty else { return }
+
+        if let idx = phases.firstIndex(of: currentPhase) {
+            let next = idx + 1
+            if next < phases.count {
+                currentPhase = phases[next]
+            } else {
+                // Loop back to first phase
+                currentPhase = phases[0]
+            }
+        } else {
+            currentPhase = phases[0]
+        }
+        phaseStartDate = .now
     }
 }
