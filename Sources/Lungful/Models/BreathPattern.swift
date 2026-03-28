@@ -72,6 +72,18 @@ public struct BreathPattern: Identifiable, Codable, Sendable {
     }
 }
 
+// MARK: - Hashable
+
+extension BreathPattern: Hashable {
+    public static func == (lhs: BreathPattern, rhs: BreathPattern) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}
+
 // MARK: - Presets
 
 extension BreathPattern {

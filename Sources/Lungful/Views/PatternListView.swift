@@ -13,8 +13,14 @@ public struct PatternListView: View {
                 spacing: 20
             ) {
                 ForEach(patterns) { pattern in
-                    NavigationLink(value: pattern.id) {
-                        PatternCard(pattern: pattern)
+                    if pattern.name == "Custom" {
+                        NavigationLink(value: "custom") {
+                            PatternCard(pattern: pattern)
+                        }
+                    } else {
+                        NavigationLink(value: pattern.id) {
+                            PatternCard(pattern: pattern)
+                        }
                     }
                 }
             }
@@ -24,6 +30,11 @@ public struct PatternListView: View {
         .navigationDestination(for: UUID.self) { id in
             if let pattern = patterns.first(where: { $0.id == id }) {
                 BreathSessionView(pattern: pattern)
+            }
+        }
+        .navigationDestination(for: String.self) { value in
+            if value == "custom" {
+                CustomPatternView()
             }
         }
     }
