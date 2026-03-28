@@ -139,4 +139,33 @@ final class BreathPatternTests: XCTestCase {
             XCTAssertEqual(decoded, phase)
         }
     }
+
+    // MARK: - Retention Hold
+
+    func testWimHofHasRetentionHold() {
+        let p = BreathPattern.wimHof
+        XCTAssertTrue(p.retentionHold)
+        XCTAssertEqual(p.recoveryHoldDuration, 15)
+    }
+
+    func testRetentionHoldDefaultsFalse() {
+        let p = BreathPattern.boxBreathing
+        XCTAssertFalse(p.retentionHold)
+        XCTAssertEqual(p.recoveryHoldDuration, 0)
+    }
+
+    func testTotalDurationIncludesRecovery() {
+        let p = BreathPattern.wimHof
+        // 30 cycles * 4s + 15s recovery = 135s (retention hold is open-ended, not counted)
+        XCTAssertEqual(p.totalDuration, 135.0)
+    }
+
+    func testRetentionEncodesDecode() throws {
+        let original = BreathPattern.wimHof
+        let data = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(BreathPattern.self, from: data)
+
+        XCTAssertEqual(decoded.retentionHold, true)
+        XCTAssertEqual(decoded.recoveryHoldDuration, 15)
+    }
 }

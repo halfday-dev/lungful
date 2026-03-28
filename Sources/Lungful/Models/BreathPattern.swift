@@ -11,6 +11,14 @@ public struct BreathPattern: Identifiable, Codable, Sendable {
     public var holdOutDuration: TimeInterval
     public var cycles: Int
 
+    /// When true, after all cycles complete the session enters an open-ended holdOut
+    /// that counts up until the user taps to release (e.g. Wim Hof retention hold).
+    public var retentionHold: Bool
+
+    /// After the retention hold, inhale and hold for this duration (recovery breath).
+    /// Only used when `retentionHold` is true. Set to 0 to skip recovery.
+    public var recoveryHoldDuration: TimeInterval
+
     public init(
         id: UUID = UUID(),
         name: String,
@@ -19,7 +27,9 @@ public struct BreathPattern: Identifiable, Codable, Sendable {
         holdInDuration: TimeInterval = 0,
         exhaleDuration: TimeInterval,
         holdOutDuration: TimeInterval = 0,
-        cycles: Int
+        cycles: Int,
+        retentionHold: Bool = false,
+        recoveryHoldDuration: TimeInterval = 0
     ) {
         precondition(inhaleDuration >= 0, "Inhale duration must be non-negative")
         precondition(holdInDuration >= 0, "Hold-in duration must be non-negative")
@@ -27,6 +37,7 @@ public struct BreathPattern: Identifiable, Codable, Sendable {
         precondition(holdOutDuration >= 0, "Hold-out duration must be non-negative")
         precondition(cycles >= 1, "Cycles must be at least 1")
         precondition(inhaleDuration + exhaleDuration > 0, "Pattern must have at least inhale or exhale")
+        precondition(recoveryHoldDuration >= 0, "Recovery hold duration must be non-negative")
 
         self.id = id
         self.name = name
@@ -36,6 +47,8 @@ public struct BreathPattern: Identifiable, Codable, Sendable {
         self.exhaleDuration = exhaleDuration
         self.holdOutDuration = holdOutDuration
         self.cycles = cycles
+        self.retentionHold = retentionHold
+        self.recoveryHoldDuration = recoveryHoldDuration
     }
 
     /// Duration of a single cycle in seconds.
@@ -43,9 +56,9 @@ public struct BreathPattern: Identifiable, Codable, Sendable {
         inhaleDuration + holdInDuration + exhaleDuration + holdOutDuration
     }
 
-    /// Total session duration in seconds.
+    /// Total session duration in seconds (excludes open-ended retention hold).
     public var totalDuration: TimeInterval {
-        cycleDuration * Double(cycles)
+        cycleDuration * Double(cycles) + recoveryHoldDuration
     }
 
     /// Returns the duration for a given phase, skipping phases with zero duration.
@@ -129,12 +142,14 @@ extension BreathPattern {
 
     public static let wimHof = BreathPattern(
         name: "Wim Hof Power Breath",
-        description: "Rapid 2-second cycles for 30 breaths. Energizing controlled hyperventilation followed by a retention hold.",
+        description: "30 rapid breaths, then exhale and hold as long as you can, then recover with a 15-second inhale hold.",
         inhaleDuration: 2,
         holdInDuration: 0,
         exhaleDuration: 2,
         holdOutDuration: 0,
-        cycles: 30
+        cycles: 30,
+        retentionHold: true,
+        recoveryHoldDuration: 15
     )
 
     public static let physiologicalSigh = BreathPattern(

@@ -238,4 +238,142 @@ final class BreathSessionViewModelTests: XCTestCase {
         XCTAssertTrue(vm.isComplete)
         XCTAssertEqual(vm.phaseTimeRemaining, 0)
     }
+
+    // MARK: - Retention Hold
+
+    func testRetentionHoldEntersAfterLastCycle() {
+        let pattern = BreathPattern(
+            name: "Retention",
+            description: "Test",
+            inhaleDuration: 1,
+            exhaleDuration: 1,
+            cycles: 1,
+            retentionHold: true,
+            recoveryHoldDuration: 5
+        )
+        let vm = makeVM(pattern)
+        vm.start()
+
+        let start = Date.now
+        // Complete the single cycle (2s)
+        vm.update(at: start.addingTimeInterval(2.5))
+
+        XCTAssertTrue(vm.isRetentionHold)
+        XCTAssertFalse(vm.isComplete)
+        XCTAssertTrue(vm.isRunning)
+        XCTAssertEqual(vm.currentPhase, .holdOut)
+    }
+
+    func testRetentionHoldCountsUp() {
+        let pattern = BreathPattern(
+            name: "Retention",
+            description: "Test",
+            inhaleDuration: 1,
+            exhaleDuration: 1,
+            cycles: 1,
+            retentionHold: true,
+            recoveryHoldDuration: 5
+        )
+        let vm = makeVM(pattern)
+        vm.start()
+
+        let start = Date.now
+        vm.update(at: start.addingTimeInterval(2.5))
+        XCTAssertTrue(vm.isRetentionHold)
+
+        // Advance 10s into retention
+        vm.update(at: start.addingTimeInterval(12.5))
+        XCTAssertGreaterThan(vm.retentionElapsed, 9.0)
+        XCTAssertTrue(vm.isRetentionHold)
+        XCTAssertFalse(vm.isComplete)
+    }
+
+    func testReleaseRetentionEntersRecovery() {
+        let pattern = BreathPattern(
+            name: "Retention",
+            description: "Test",
+            inhaleDuration: 1,
+            exhaleDuration: 1,
+            cycles: 1,
+            retentionHold: true,
+            recoveryHoldDuration: 5
+        )
+        let vm = makeVM(pattern)
+        vm.start()
+
+        let start = Date.now
+        vm.update(at: start.addingTimeInterval(2.5))
+        XCTAssertTrue(vm.isRetentionHold)
+
+        vm.releaseRetention()
+        XCTAssertFalse(vm.isRetentionHold)
+        XCTAssertTrue(vm.isRecoveryHold)
+        XCTAssertEqual(vm.currentPhase, .holdIn)
+        XCTAssertFalse(vm.isComplete)
+    }
+
+    func testRecoveryHoldCompletes() {
+        let pattern = BreathPattern(
+            name: "Retention",
+            description: "Test",
+            inhaleDuration: 1,
+            exhaleDuration: 1,
+            cycles: 1,
+            retentionHold: true,
+            recoveryHoldDuration: 5
+        )
+        let vm = makeVM(pattern)
+        vm.start()
+
+        let start = Date.now
+        vm.update(at: start.addingTimeInterval(2.5))
+        vm.releaseRetention()
+
+        // Advance past recovery (5s)
+        vm.update(at: Date.now.addingTimeInterval(6.0))
+        XCTAssertFalse(vm.isRecoveryHold)
+        XCTAssertTrue(vm.isComplete)
+        XCTAssertFalse(vm.isRunning)
+    }
+
+    func testRetentionWithNoRecoveryCompletesImmediately() {
+        let pattern = BreathPattern(
+            name: "Retention Only",
+            description: "Test",
+            inhaleDuration: 1,
+            exhaleDuration: 1,
+            cycles: 1,
+            retentionHold: true,
+            recoveryHoldDuration: 0
+        )
+        let vm = makeVM(pattern)
+        vm.start()
+
+        let start = Date.now
+        vm.update(at: start.addingTimeInterval(2.5))
+        XCTAssertTrue(vm.isRetentionHold)
+
+        vm.releaseRetention()
+        XCTAssertTrue(vm.isComplete)
+        XCTAssertFalse(vm.isRunning)
+    }
+
+    func testPatternWithoutRetentionUnaffected() {
+        // Ensure existing patterns still complete normally
+        let pattern = BreathPattern(
+            name: "Normal",
+            description: "Test",
+            inhaleDuration: 1,
+            exhaleDuration: 1,
+            cycles: 1
+        )
+        let vm = makeVM(pattern)
+        vm.start()
+
+        let start = Date.now
+        vm.update(at: start.addingTimeInterval(3.0))
+        XCTAssertTrue(vm.isComplete)
+        XCTAssertFalse(vm.isRetentionHold)
+        XCTAssertFalse(vm.isRecoveryHold)
+    }
 }

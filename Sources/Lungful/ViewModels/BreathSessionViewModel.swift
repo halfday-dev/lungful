@@ -19,6 +19,15 @@ public final class BreathSessionViewModel: ObservableObject {
     @Published public private(set) var isPaused: Bool = false
     @Published public private(set) var isCompletionAnimating: Bool = false
 
+    /// True when in an open-ended retention hold (user must tap to release).
+    @Published public private(set) var isRetentionHold: Bool = false
+
+    /// Elapsed time during retention hold (counts up).
+    @Published public private(set) var retentionElapsed: TimeInterval = 0
+
+    /// True when in the fixed-duration recovery breath after retention.
+    @Published public private(set) var isRecoveryHold: Bool = false
+
     /// Scale value for the breath circle (0.35 → 1.0), computed each frame.
     @Published public private(set) var circleScale: CGFloat = 0.35
 
@@ -77,6 +86,26 @@ public final class BreathSessionViewModel: ObservableObject {
         reset()
     }
 
+    /// Called by user tap during retention hold to release and move to recovery breath.
+    public func releaseRetention() {
+        guard isRetentionHold else { return }
+        isRetentionHold = false
+
+        if pattern.recoveryHoldDuration > 0 {
+            // Enter recovery: inhale and hold
+            isRecoveryHold = true
+            currentPhase = .holdIn
+            currentPhaseDuration = pattern.recoveryHoldDuration
+            phaseProgress = 0.0
+            phaseTimeRemaining = pattern.recoveryHoldDuration
+            phaseStartDate = .now
+            pauseElapsed = 0
+            playPhaseHaptic(.holdIn)
+        } else {
+            completeSession()
+        }
+    }
+
     // MARK: - Timer
 
     private func startTimer() {
@@ -98,11 +127,35 @@ public final class BreathSessionViewModel: ObservableObject {
     func update(at date: Date) -> Bool {
         guard isRunning, !isPaused else { return false }
 
+        // Retention hold: count up, wait for user tap
+        if isRetentionHold {
+            retentionElapsed = date.timeIntervalSince(phaseStartDate)
+            circleScale = 0.35  // contracted (exhaled)
+            lastUpdateDate = date
+            return true
+        }
+
+        // Recovery hold after retention: fixed countdown, then complete
+        if isRecoveryHold {
+            let elapsed = date.timeIntervalSince(phaseStartDate)
+            phaseTimeRemaining = max(0, currentPhaseDuration - elapsed)
+            let progress = min(elapsed / currentPhaseDuration, 1.0)
+            phaseProgress = progress
+            circleScale = 1.0  // expanded (inhaled)
+
+            if progress >= 1.0 {
+                isRecoveryHold = false
+                completeSession()
+            }
+            lastUpdateDate = date
+            return true
+        }
+
         // Limit phase advances per frame to prevent infinite loops
         var advances = 0
         let maxAdvances = pattern.activePhases.count * pattern.cycles
 
-        while isRunning, advances <= maxAdvances {
+        while isRunning, !isRetentionHold, advances <= maxAdvances {
             guard currentPhaseDuration > 0 else {
                 advancePhase(at: date)
                 advances += 1
@@ -178,17 +231,31 @@ public final class BreathSessionViewModel: ObservableObject {
             if currentCycle < pattern.cycles {
                 currentCycle += 1
                 beginPhase(pattern.activePhases.first ?? .inhale, at: date)
-            } else {
-                // Session complete
-                phaseProgress = 1.0
+            } else if pattern.retentionHold && !isRetentionHold && !isRecoveryHold {
+                // Enter retention hold — open-ended holdOut, counts up
+                isRetentionHold = true
+                retentionElapsed = 0
+                currentPhase = .holdOut
+                currentPhaseDuration = 0
+                phaseProgress = 0
                 phaseTimeRemaining = 0
-                isRunning = false
-                isCompletionAnimating = true
-                isComplete = true
-                stopTimer()
-                playCompletionHaptic()
+                phaseStartDate = date
+                circleScale = 0.35
+                // No haptic — silence IS the hold
+            } else {
+                completeSession()
             }
         }
+    }
+
+    private func completeSession() {
+        phaseProgress = 1.0
+        phaseTimeRemaining = 0
+        isRunning = false
+        isCompletionAnimating = true
+        isComplete = true
+        stopTimer()
+        playCompletionHaptic()
     }
 
     private func reset() {
@@ -199,6 +266,9 @@ public final class BreathSessionViewModel: ObservableObject {
         isComplete = false
         isCompletionAnimating = false
         isPaused = false
+        isRetentionHold = false
+        retentionElapsed = 0
+        isRecoveryHold = false
         circleScale = 0.35
         pauseElapsed = 0
     }

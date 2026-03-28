@@ -53,6 +53,26 @@ public struct BreathCircleView: View {
                     .font(.system(size: 38, weight: .ultraLight, design: .default))
                     .foregroundStyle(Theme.bone)
                     .transition(.opacity)
+            } else if viewModel.isRetentionHold {
+                Text("Hold")
+                    .font(.system(size: 38, weight: .ultraLight, design: .default))
+                    .foregroundStyle(Theme.bone)
+
+                // Count up during retention
+                Text(retentionTimeString)
+                    .font(.system(size: 16, weight: .light, design: .monospaced))
+                    .foregroundStyle(Theme.dust)
+                    .monospacedDigit()
+            } else if viewModel.isRecoveryHold {
+                Text("Recovery")
+                    .font(.system(size: 38, weight: .ultraLight, design: .default))
+                    .foregroundStyle(Theme.bone)
+
+                Text(String(format: "%.1f", viewModel.phaseTimeRemaining))
+                    .font(.system(size: 16, weight: .light, design: .monospaced))
+                    .foregroundStyle(Theme.dust)
+                    .contentTransition(.numericText())
+                    .monospacedDigit()
             } else {
                 Text(viewModel.currentPhase.label)
                     .font(.system(size: 38, weight: .ultraLight, design: .default))
@@ -62,7 +82,8 @@ public struct BreathCircleView: View {
                     .dynamicTypeSize(...DynamicTypeSize.accessibility1)
             }
 
-            if viewModel.isRunning && !viewModel.isPaused && !viewModel.isComplete {
+            if viewModel.isRunning && !viewModel.isPaused && !viewModel.isComplete
+                && !viewModel.isRetentionHold && !viewModel.isRecoveryHold {
                 Text(String(format: "%.1f", viewModel.phaseTimeRemaining))
                     .font(.system(size: 16, weight: .light, design: .monospaced))
                     .foregroundStyle(Theme.dust)
@@ -70,6 +91,14 @@ public struct BreathCircleView: View {
                     .monospacedDigit()
             }
         }
+    }
+
+    /// Formats retention elapsed time as m:ss.
+    private var retentionTimeString: String {
+        let total = Int(viewModel.retentionElapsed)
+        let minutes = total / 60
+        let seconds = total % 60
+        return String(format: "%d:%02d", minutes, seconds)
     }
 
     private var phaseColor: Color {

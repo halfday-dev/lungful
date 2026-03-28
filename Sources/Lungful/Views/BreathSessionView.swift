@@ -29,7 +29,7 @@ public struct BreathSessionView: View {
             VStack(spacing: 0) {
                 // DR-5: Cycle count at the very top of the screen
                 if viewModel.isRunning || viewModel.isComplete {
-                    Text("\(viewModel.currentCycle) of \(viewModel.totalCycles)")
+                    Text(cycleLabel)
                         .font(.system(size: 13, weight: .regular, design: .default))
                         .foregroundStyle(Theme.shadow)
                         .padding(.top, 16)
@@ -87,7 +87,12 @@ public struct BreathSessionView: View {
     @ViewBuilder
     private var sessionControls: some View {
         HStack(spacing: 40) {
-            if viewModel.isRunning && viewModel.isPaused {
+            if viewModel.isRetentionHold {
+                // Retention hold — tap to release
+                Button("Release") { viewModel.releaseRetention() }
+                    .font(.system(size: 20, weight: .medium, design: .default))
+                    .foregroundStyle(Theme.ochre)
+            } else if viewModel.isRunning && viewModel.isPaused {
                 // Paused
                 Button("Resume") { viewModel.resume() }
                     .foregroundStyle(Theme.dust)
@@ -124,13 +129,23 @@ public struct BreathSessionView: View {
 
     // MARK: - Helpers
 
+    private var cycleLabel: String {
+        if viewModel.isRetentionHold {
+            return "retention"
+        } else if viewModel.isRecoveryHold {
+            return "recovery"
+        } else {
+            return "\(viewModel.currentCycle) of \(viewModel.totalCycles)"
+        }
+    }
+
     /// Phase color for background tint.
     private var phaseColor: Color {
         Theme.color(for: viewModel.currentPhase)
     }
 
     private var phaseSummary: String {
-        let parts = [
+        var parts = [
             ("In", pattern.inhaleDuration),
             ("Hold", pattern.holdInDuration),
             ("Out", pattern.exhaleDuration),
@@ -138,6 +153,13 @@ public struct BreathSessionView: View {
         ]
         .filter { $0.1 > 0 }
         .map { "\($0.0) \(formatted($0.1))s" }
+
+        if pattern.retentionHold {
+            parts.append("Retain ∞")
+            if pattern.recoveryHoldDuration > 0 {
+                parts.append("Recover \(formatted(pattern.recoveryHoldDuration))s")
+            }
+        }
 
         return parts.joined(separator: " · ")
     }
