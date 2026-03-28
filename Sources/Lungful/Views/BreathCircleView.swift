@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// The breathing circle — expands on inhale, contracts on exhale.
+/// Uses a Timer to drive updates outside of view body evaluation.
 public struct BreathCircleView: View {
     @ObservedObject var viewModel: BreathSessionViewModel
 
@@ -40,6 +41,7 @@ public struct BreathCircleView: View {
                     .font(.system(size: 32, weight: .light, design: .rounded))
                     .foregroundStyle(.white)
                     .contentTransition(.numericText())
+                    .accessibilityLabel(viewModel.currentPhase.accessibilityLabel)
 
                 if viewModel.isRunning || viewModel.isComplete {
                     Text("\(viewModel.currentCycle) of \(viewModel.totalCycles)")
@@ -48,6 +50,8 @@ public struct BreathCircleView: View {
                 }
             }
         }
+        .animation(.easeInOut(duration: 0.15), value: viewModel.circleScale)
+        .animation(.easeInOut(duration: 0.15), value: viewModel.currentPhase)
     }
 
     private var phaseColor: Color {

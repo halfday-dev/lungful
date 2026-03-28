@@ -74,4 +74,38 @@ final class BreathPatternTests: XCTestCase {
             XCTAssertGreaterThan(preset.cycles, 0, "\(preset.name) cycles must be > 0")
         }
     }
+
+    // MARK: - Single Cycle Pattern
+
+    func testSingleCyclePattern() {
+        let pattern = BreathPattern(
+            name: "Single",
+            description: "One cycle",
+            inhaleDuration: 3,
+            exhaleDuration: 3,
+            cycles: 1
+        )
+        XCTAssertEqual(pattern.cycles, 1)
+        XCTAssertEqual(pattern.cycleDuration, 6.0)
+        XCTAssertEqual(pattern.totalDuration, 6.0)
+        XCTAssertEqual(pattern.activePhases, [.inhale, .exhale])
+    }
+
+    // MARK: - Inhale+Exhale Only (No Holds)
+
+    func testPatternWithNoHolds() {
+        let pattern = BreathPattern(
+            name: "No Holds",
+            description: "Just in and out",
+            inhaleDuration: 4,
+            holdInDuration: 0,
+            exhaleDuration: 6,
+            holdOutDuration: 0,
+            cycles: 3
+        )
+        XCTAssertEqual(pattern.activePhases, [.inhale, .exhale])
+        XCTAssertEqual(pattern.cycleDuration, 10.0)
+        XCTAssertNil(pattern.nextPhase(after: .exhale))
+        XCTAssertEqual(pattern.nextPhase(after: .inhale), .exhale)
+    }
 }

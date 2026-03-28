@@ -9,17 +9,20 @@ let package = Package(
         .macOS(.v14)
     ],
     products: [
-        .library(name: "Lungful", targets: ["Lungful"])
+        .library(name: "Lungful", targets: ["Lungful"]),
+        .executable(name: "LungfulDemo", targets: ["LungfulDemo"])
     ],
     targets: [
         .target(
-            name: "Lungful",
-            path: "Sources/Lungful"
+            name: "Lungful"
+        ),
+        .executableTarget(
+            name: "LungfulDemo",
+            dependencies: ["Lungful"]
         ),
         .testTarget(
             name: "LungfulTests",
-            dependencies: ["Lungful"],
-            path: "Tests/LungfulTests"
+            dependencies: ["Lungful"]
         )
     ]
 )

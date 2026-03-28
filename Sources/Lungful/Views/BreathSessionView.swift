@@ -41,7 +41,15 @@ public struct BreathSessionView: View {
 
                 // Controls
                 HStack(spacing: 40) {
-                    if viewModel.isRunning {
+                    if viewModel.isRunning && viewModel.isPaused {
+                        Button(action: { viewModel.resume() }) {
+                            controlIcon("play.fill")
+                        }
+
+                        Button(action: { viewModel.stop() }) {
+                            controlIcon("stop.fill")
+                        }
+                    } else if viewModel.isRunning {
                         Button(action: { viewModel.pause() }) {
                             controlIcon("pause.fill")
                         }

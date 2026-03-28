@@ -1,8 +1,8 @@
 import Foundation
-import Combine
 import SwiftUI
 
-/// Drives a breathing session: cycles through phases on a timer, exposes progress for UI binding.
+/// Drives a breathing session: cycles through phases, exposes progress for UI binding.
+/// Designed to be driven by `TimelineView(.animation)` — call `update(at:)` each frame.
 @MainActor
 public final class BreathSessionViewModel: ObservableObject {
 
@@ -13,8 +13,9 @@ public final class BreathSessionViewModel: ObservableObject {
     @Published public private(set) var currentCycle: Int = 1
     @Published public private(set) var isRunning: Bool = false
     @Published public private(set) var isComplete: Bool = false
+    @Published public private(set) var isPaused: Bool = false
 
-    /// Animated scale value for the breath circle (0.35 → 1.0).
+    /// Scale value for the breath circle (0.35 → 1.0), computed each frame.
     @Published public private(set) var circleScale: CGFloat = 0.35
 
     // MARK: - Configuration
@@ -25,11 +26,11 @@ public final class BreathSessionViewModel: ObservableObject {
 
     // MARK: - Private
 
-    private var displayLink: AnyCancellable?
     private var phaseStartDate: Date = .now
     private var currentPhaseDuration: TimeInterval = 0
-    private var isPaused: Bool = false
     private var pauseElapsed: TimeInterval = 0
+    private var lastUpdateDate: Date = .now
+    private var displayTimer: Timer?
 
     // MARK: - Init
 
@@ -44,14 +45,14 @@ public final class BreathSessionViewModel: ObservableObject {
         reset()
         isRunning = true
         isComplete = false
-        beginPhase(pattern.activePhases.first ?? .inhale)
+        beginPhase(pattern.activePhases.first ?? .inhale, at: .now)
         startTimer()
     }
 
     public func pause() {
         guard isRunning, !isPaused else { return }
         isPaused = true
-        pauseElapsed = Date.now.timeIntervalSince(phaseStartDate)
+        pauseElapsed = lastUpdateDate.timeIntervalSince(phaseStartDate)
         stopTimer()
     }
 
@@ -63,68 +64,84 @@ public final class BreathSessionViewModel: ObservableObject {
     }
 
     public func stop() {
+        stopTimer()
         isRunning = false
         isPaused = false
-        stopTimer()
         reset()
     }
 
     // MARK: - Timer
 
     private func startTimer() {
-        // ~60fps via Timer on the main run loop
-        displayLink = Timer.publish(every: 1.0 / 60.0, on: .main, in: .common)
-            .autoconnect()
-            .sink { [weak self] _ in
-                self?.tick()
+        stopTimer()
+        displayTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.update(at: .now)
             }
+        }
     }
 
     private func stopTimer() {
-        displayLink?.cancel()
-        displayLink = nil
+        displayTimer?.invalidate()
+        displayTimer = nil
     }
 
-    private func tick() {
-        let elapsed = Date.now.timeIntervalSince(phaseStartDate)
-        guard currentPhaseDuration > 0 else {
-            advancePhase()
-            return
-        }
+    /// Called by timer. Computes elapsed time and advances phases.
+    @discardableResult
+    func update(at date: Date) -> Bool {
+        guard isRunning, !isPaused else { return false }
 
-        let progress = min(elapsed / currentPhaseDuration, 1.0)
-        phaseProgress = progress
+        // Limit phase advances per frame to prevent infinite loops
+        var advances = 0
+        let maxAdvances = pattern.activePhases.count * pattern.cycles
 
-        // Interpolate circle scale
-        let startScale = scaleAtPhaseStart(currentPhase)
-        let endScale = currentPhase.targetScale
-        withAnimation(.linear(duration: 1.0 / 60.0)) {
+        while isRunning, advances <= maxAdvances {
+            guard currentPhaseDuration > 0 else {
+                advancePhase(at: date)
+                advances += 1
+                continue
+            }
+
+            let elapsed = date.timeIntervalSince(phaseStartDate)
+            let progress = min(elapsed / currentPhaseDuration, 1.0)
+            phaseProgress = progress
+
+            // Interpolate circle scale
+            let startScale = scaleForPhase(previousPhase(before: currentPhase))
+            let endScale = scaleForPhase(currentPhase)
             circleScale = startScale + (endScale - startScale) * progress
-        }
 
-        if progress >= 1.0 {
-            advancePhase()
+            if progress >= 1.0 {
+                // Advance with the exact end time of this phase for accurate chaining
+                let phaseEndDate = phaseStartDate.addingTimeInterval(currentPhaseDuration)
+                advancePhase(at: phaseEndDate)
+                advances += 1
+            } else {
+                break
+            }
         }
+        lastUpdateDate = date
+        return true
     }
 
     // MARK: - Phase Management
 
-    private func beginPhase(_ phase: BreathPhase) {
+    private func beginPhase(_ phase: BreathPhase, at date: Date) {
         currentPhase = phase
         currentPhaseDuration = pattern.duration(for: phase)
         phaseProgress = 0.0
-        phaseStartDate = .now
+        phaseStartDate = date
         pauseElapsed = 0
     }
 
-    private func advancePhase() {
+    private func advancePhase(at date: Date) {
         if let next = pattern.nextPhase(after: currentPhase) {
-            beginPhase(next)
+            beginPhase(next, at: date)
         } else {
             // Cycle complete
             if currentCycle < pattern.cycles {
                 currentCycle += 1
-                beginPhase(pattern.activePhases.first ?? .inhale)
+                beginPhase(pattern.activePhases.first ?? .inhale, at: date)
             } else {
                 // Session complete
                 phaseProgress = 1.0
@@ -140,17 +157,29 @@ public final class BreathSessionViewModel: ObservableObject {
         phaseProgress = 0.0
         currentCycle = 1
         isComplete = false
+        isPaused = false
         circleScale = 0.35
         pauseElapsed = 0
     }
 
-    /// The circle scale at the *start* of a given phase.
-    private func scaleAtPhaseStart(_ phase: BreathPhase) -> CGFloat {
+    // MARK: - Scale Helpers
+
+    /// Target scale for a given phase.
+    private func scaleForPhase(_ phase: BreathPhase) -> CGFloat {
         switch phase {
-        case .inhale:  return 0.35
-        case .holdIn:  return 1.0
-        case .exhale:  return 1.0
-        case .holdOut: return 0.35
+        case .inhale, .holdIn:  return 1.0
+        case .exhale, .holdOut: return 0.35
         }
+    }
+
+    /// The phase that comes before the given phase in the active sequence,
+    /// used to determine the starting scale for interpolation.
+    private func previousPhase(before phase: BreathPhase) -> BreathPhase {
+        let active = pattern.activePhases
+        guard let idx = active.firstIndex(of: phase), idx > 0 else {
+            // First phase or not found — use last phase of previous cycle
+            return active.last ?? .holdOut
+        }
+        return active[idx - 1]
     }
 }
