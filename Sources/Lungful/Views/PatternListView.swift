@@ -26,7 +26,7 @@ public struct PatternListView: View {
             }
             .padding(24)
         }
-        .background(Color.black)
+        .background(Theme.deepStone)
         .navigationDestination(for: UUID.self) { id in
             if let pattern = patterns.first(where: { $0.id == id }) {
                 BreathSessionView(pattern: pattern)
@@ -49,11 +49,11 @@ private struct PatternCard: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(pattern.name)
                 .font(.system(size: 22, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(Theme.bone)
 
             Text(pattern.description)
                 .font(.system(size: 14, weight: .regular, design: .rounded))
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(Theme.dust)
                 .lineLimit(3)
                 .multilineTextAlignment(.leading)
 
@@ -62,14 +62,14 @@ private struct PatternCard: View {
                 Label(formattedDuration(pattern.totalDuration), systemImage: "clock")
             }
             .font(.system(size: 13, weight: .medium, design: .rounded))
-            .foregroundStyle(.white.opacity(0.4))
+            .foregroundStyle(Theme.shadow)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(.white.opacity(0.06))
-                .strokeBorder(.white.opacity(0.1), lineWidth: 1)
+                .fill(Theme.warmClay)
+                .strokeBorder(Theme.kilnEdge, lineWidth: 1)
         )
     }
 

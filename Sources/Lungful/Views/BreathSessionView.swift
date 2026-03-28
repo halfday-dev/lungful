@@ -15,7 +15,7 @@ public struct BreathSessionView: View {
     public var body: some View {
         ZStack {
             // Background
-            Color.black
+            Theme.deepStone
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -24,6 +24,7 @@ public struct BreathSessionView: View {
                 // Breath circle
                 BreathCircleView(viewModel: viewModel)
                     .frame(maxWidth: .infinity)
+                    .frame(height: 500)
 
                 Spacer()
 
@@ -31,11 +32,11 @@ public struct BreathSessionView: View {
                 VStack(spacing: 4) {
                     Text(pattern.name)
                         .font(.system(size: 20, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.8))
+                        .foregroundStyle(Theme.bone.opacity(0.8))
 
                     Text(phaseSummary)
                         .font(.system(size: 14, weight: .regular, design: .monospaced))
-                        .foregroundStyle(.white.opacity(0.4))
+                        .foregroundStyle(Theme.shadow)
                 }
                 .padding(.bottom, 32)
 
@@ -102,8 +103,8 @@ public struct BreathSessionView: View {
     private func controlIcon(_ systemName: String) -> some View {
         Image(systemName: systemName)
             .font(.system(size: 28, weight: .medium))
-            .foregroundStyle(.white)
+            .foregroundStyle(Theme.bone)
             .frame(width: 64, height: 64)
-            .background(Circle().fill(.white.opacity(0.1)))
+            .background(Circle().fill(Theme.kilnEdge))
     }
 }

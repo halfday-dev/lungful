@@ -12,7 +12,7 @@ public struct CustomPatternView: View {
 
     public var body: some View {
         ZStack {
-            Color.black
+            Theme.deepStone
                 .ignoresSafeArea()
 
             ScrollView {
@@ -21,25 +21,25 @@ public struct CustomPatternView: View {
                         PhaseRow(
                             label: "Inhale",
                             value: $inhaleDuration,
-                            color: .cyan
+                            color: Theme.sage
                         )
 
                         PhaseRow(
                             label: "Hold In",
                             value: $holdInDuration,
-                            color: .blue
+                            color: Theme.amber
                         )
 
                         PhaseRow(
                             label: "Exhale",
                             value: $exhaleDuration,
-                            color: .indigo
+                            color: Theme.terracotta
                         )
 
                         PhaseRow(
                             label: "Hold Out",
                             value: $holdOutDuration,
-                            color: .purple
+                            color: Theme.slate
                         )
                     }
 
@@ -48,13 +48,13 @@ public struct CustomPatternView: View {
                         HStack {
                             Text("Cycles")
                                 .font(.system(size: 16, weight: .medium, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.6))
+                                .foregroundStyle(Theme.dust)
 
                             Spacer()
 
                             Text("\(cycles)")
                                 .font(.system(size: 24, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(Theme.bone)
                                 .frame(minWidth: 44, alignment: .trailing)
                         }
 
@@ -62,7 +62,7 @@ public struct CustomPatternView: View {
                             Button(action: { if cycles > 1 { cycles -= 1 } }) {
                                 Image(systemName: "minus.circle.fill")
                                     .font(.system(size: 24))
-                                    .foregroundStyle(.white.opacity(cycles > 1 ? 0.6 : 0.2))
+                                    .foregroundStyle(cycles > 1 ? Theme.dust : Theme.shadow)
                             }
                             .disabled(cycles <= 1)
 
@@ -74,12 +74,12 @@ public struct CustomPatternView: View {
                                 in: 1...60,
                                 step: 1
                             )
-                            .tint(.cyan)
+                            .tint(Theme.ochre)
 
                             Button(action: { if cycles < 60 { cycles += 1 } }) {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.system(size: 24))
-                                    .foregroundStyle(.white.opacity(cycles < 60 ? 0.6 : 0.2))
+                                    .foregroundStyle(cycles < 60 ? Theme.dust : Theme.shadow)
                             }
                             .disabled(cycles >= 60)
                         }
@@ -87,8 +87,8 @@ public struct CustomPatternView: View {
                     .padding(20)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(.white.opacity(0.06))
-                            .strokeBorder(.white.opacity(0.1), lineWidth: 1)
+                            .fill(Theme.warmClay)
+                            .strokeBorder(Theme.kilnEdge, lineWidth: 1)
                     )
 
                     // Session summary
@@ -112,10 +112,10 @@ public struct CustomPatternView: View {
                     .frame(maxWidth: .infinity)
                     .background(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(.white.opacity(0.04))
+                            .fill(Theme.warmClay.opacity(0.6))
                     )
 
-                    // Start button
+                    // Start button — solid ochre fill, black text, no gradient
                     NavigationLink(value: buildPattern()) {
                         Text("Start")
                             .font(.system(size: 20, weight: .semibold, design: .rounded))
@@ -124,13 +124,7 @@ public struct CustomPatternView: View {
                             .frame(height: 56)
                             .background(
                                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [.cyan, .blue],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
+                                    .fill(Theme.ochre)
                             )
                     }
                     .disabled(!isValid)
@@ -219,25 +213,25 @@ private struct PhaseRow: View {
 
                 Text(label)
                     .font(.system(size: 16, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(Theme.dust)
 
                 Spacer()
 
                 Text(formattedValue)
                     .font(.system(size: 24, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Theme.bone)
                     .frame(minWidth: 44, alignment: .trailing)
 
                 Text("s")
                     .font(.system(size: 14, weight: .regular, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(Theme.shadow)
             }
 
             HStack(spacing: 16) {
                 Button(action: { if value > 0 { value = max(0, value - 0.5) } }) {
                     Image(systemName: "minus.circle.fill")
                         .font(.system(size: 24))
-                        .foregroundStyle(.white.opacity(value > 0 ? 0.6 : 0.2))
+                        .foregroundStyle(value > 0 ? Theme.dust : Theme.shadow)
                 }
                 .disabled(value <= 0)
 
@@ -247,7 +241,7 @@ private struct PhaseRow: View {
                 Button(action: { if value < 30 { value = min(30, value + 0.5) } }) {
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 24))
-                        .foregroundStyle(.white.opacity(value < 30 ? 0.6 : 0.2))
+                        .foregroundStyle(value < 30 ? Theme.dust : Theme.shadow)
                 }
                 .disabled(value >= 30)
             }
@@ -255,7 +249,7 @@ private struct PhaseRow: View {
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(.white.opacity(0.06))
+                .fill(Theme.warmClay)
                 .strokeBorder(color.opacity(0.2), lineWidth: 1)
         )
     }
@@ -277,11 +271,11 @@ private struct SummaryItem: View {
         VStack(spacing: 4) {
             Image(systemName: icon)
                 .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(Theme.shadow)
 
             Text(label)
                 .font(.system(size: 13, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(Theme.dust)
         }
     }
 }
