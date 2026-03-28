@@ -7,6 +7,7 @@ public struct CustomPatternView: View {
     @State private var exhaleDuration: Double = 4.0
     @State private var holdOutDuration: Double = 0.0
     @State private var cycles: Int = 6
+    @State private var editingPhase: String?
 
     public init() {}
 
@@ -27,29 +28,33 @@ public struct CustomPatternView: View {
                     .frame(height: 140)
 
                     // Phase rows — no card backgrounds, generous spacing
-                    VStack(spacing: 32) {
+                    VStack(spacing: 20) {
                         PhaseRow(
                             label: "Inhale",
                             value: $inhaleDuration,
-                            color: Theme.sage
+                            color: Theme.sage,
+                            editingPhase: $editingPhase
                         )
 
                         PhaseRow(
                             label: "Hold In",
                             value: $holdInDuration,
-                            color: Theme.amber
+                            color: Theme.amber,
+                            editingPhase: $editingPhase
                         )
 
                         PhaseRow(
                             label: "Exhale",
                             value: $exhaleDuration,
-                            color: Theme.terracotta
+                            color: Theme.terracotta,
+                            editingPhase: $editingPhase
                         )
 
                         PhaseRow(
                             label: "Hold Out",
                             value: $holdOutDuration,
-                            color: Theme.slate
+                            color: Theme.slate,
+                            editingPhase: $editingPhase
                         )
                     }
 
@@ -172,14 +177,23 @@ public struct CustomPatternView: View {
 
 // MARK: - Phase Row
 
-/// Minimal phase control: colored dot, label, value, and slider. No card background.
+/// Minimal phase control: colored dot, label, tappable value with inline wheel picker.
 private struct PhaseRow: View {
     let label: String
     @Binding var value: Double
     let color: Color
+    @Binding var editingPhase: String?
+
+    private var isEditing: Bool {
+        editingPhase == label
+    }
+
+    private static let pickerValues: [Double] = {
+        stride(from: 0.0, through: 30.0, by: 0.5).map { $0 }
+    }()
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 0) {
             HStack {
                 Circle()
                     .fill(color)
@@ -191,25 +205,54 @@ private struct PhaseRow: View {
 
                 Spacer()
 
-                Text(formattedValue)
-                    .font(.system(size: 24, weight: .semibold, design: .default))
-                    .foregroundStyle(Theme.bone)
-                    .frame(minWidth: 44, alignment: .trailing)
+                Button {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        if isEditing {
+                            editingPhase = nil
+                        } else {
+                            editingPhase = label
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 2) {
+                        Text(formattedValue)
+                            .font(.system(size: 24, weight: .semibold, design: .default))
+                            .foregroundStyle(isEditing ? color : Theme.bone)
+                            .frame(minWidth: 44, alignment: .trailing)
 
-                Text("s")
-                    .font(.system(size: 14, weight: .regular, design: .default))
-                    .foregroundStyle(Theme.shadow)
+                        Text("s")
+                            .font(.system(size: 14, weight: .regular, design: .default))
+                            .foregroundStyle(isEditing ? color.opacity(0.6) : Theme.shadow)
+                    }
+                }
+                .buttonStyle(.plain)
             }
 
-            Slider(value: $value, in: 0...30, step: 0.5)
+            if isEditing {
+                Picker("", selection: $value) {
+                    ForEach(Self.pickerValues, id: \.self) { v in
+                        Text(Self.formatPickerValue(v))
+                            .tag(v)
+                    }
+                }
+                #if os(iOS)
+                .pickerStyle(.wheel)
+                #endif
+                .frame(height: 140)
                 .tint(color)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
         }
     }
 
     private var formattedValue: String {
-        value.truncatingRemainder(dividingBy: 1) == 0
-            ? String(format: "%.0f", value)
-            : String(format: "%.1f", value)
+        Self.formatPickerValue(value)
+    }
+
+    fileprivate static func formatPickerValue(_ v: Double) -> String {
+        v.truncatingRemainder(dividingBy: 1) == 0
+            ? String(format: "%.0f", v)
+            : String(format: "%.1f", v)
     }
 }
 
