@@ -9,14 +9,20 @@ public struct PatternListView: View {
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 4) {
-                // Custom header
-                Text("lungful")
-                    .font(.system(size: 28, weight: .light, design: .default))
-                    .foregroundStyle(Theme.bone)
+                // Custom header with breath ring logo
+                HStack(spacing: 10) {
+                    BreathRingLogo(size: 24, color: Theme.bone)
+
+                    Text("lungful")
+                        .font(.system(size: 28, weight: .light, design: .default))
+                        .foregroundStyle(Theme.bone)
+                        .tracking(0.56) // +2% of 28pt
+                }
 
                 Text("\(patterns.count) patterns")
                     .font(.system(size: 14, weight: .regular, design: .default))
                     .foregroundStyle(Theme.shadow)
+                    .padding(.leading, 34) // align with text after logo
             }
             .frame(maxWidth: 600, alignment: .leading)
             .padding(.horizontal, 24)
