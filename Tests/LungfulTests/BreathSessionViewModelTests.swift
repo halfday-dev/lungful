@@ -17,6 +17,7 @@ final class BreathSessionViewModelTests: XCTestCase {
         XCTAssertFalse(vm.isPaused)
         XCTAssertEqual(vm.currentCycle, 1)
         XCTAssertEqual(vm.phaseProgress, 0.0)
+        XCTAssertEqual(vm.phaseTimeRemaining, 0)
         XCTAssertEqual(vm.totalCycles, 8)
     }
 
@@ -163,5 +164,78 @@ final class BreathSessionViewModelTests: XCTestCase {
         // Complete cycle 2
         vm.update(at: start.addingTimeInterval(5.0))
         XCTAssertTrue(vm.isComplete)
+    }
+
+    // MARK: - Phase Time Remaining
+
+    func testPhaseTimeRemainingInitiallyZero() {
+        let vm = makeVM()
+        XCTAssertEqual(vm.phaseTimeRemaining, 0)
+    }
+
+    func testPhaseTimeRemainingSetOnStart() {
+        let vm = makeVM(.boxBreathing)
+        vm.start()
+        // After start, phaseTimeRemaining should equal the first phase duration (4s for box)
+        XCTAssertEqual(vm.phaseTimeRemaining, 4.0, accuracy: 0.1)
+        vm.stop()
+    }
+
+    func testPhaseTimeRemainingCountsDown() {
+        let pattern = BreathPattern(
+            name: "Countdown",
+            description: "Test",
+            inhaleDuration: 10,
+            exhaleDuration: 10,
+            cycles: 1
+        )
+        let vm = makeVM(pattern)
+        vm.start()
+
+        let start = Date.now
+        vm.update(at: start.addingTimeInterval(3.0))
+        // 10s phase, 3s elapsed → 7s remaining
+        XCTAssertEqual(vm.phaseTimeRemaining, 7.0, accuracy: 0.2)
+
+        vm.update(at: start.addingTimeInterval(8.0))
+        // 10s phase, 8s elapsed → 2s remaining
+        XCTAssertEqual(vm.phaseTimeRemaining, 2.0, accuracy: 0.2)
+        vm.stop()
+    }
+
+    func testPhaseTimeRemainingNeverNegative() {
+        let pattern = BreathPattern(
+            name: "Short",
+            description: "Test",
+            inhaleDuration: 2,
+            exhaleDuration: 2,
+            cycles: 1
+        )
+        let vm = makeVM(pattern)
+        vm.start()
+
+        let start = Date.now
+        // Advance well past phase end
+        vm.update(at: start.addingTimeInterval(3.0))
+        // Should be in exhale now, remaining should be positive (not negative from overshoot)
+        XCTAssertGreaterThanOrEqual(vm.phaseTimeRemaining, 0)
+        vm.stop()
+    }
+
+    func testPhaseTimeRemainingZeroOnCompletion() {
+        let pattern = BreathPattern(
+            name: "Done",
+            description: "Test",
+            inhaleDuration: 1,
+            exhaleDuration: 1,
+            cycles: 1
+        )
+        let vm = makeVM(pattern)
+        vm.start()
+
+        let start = Date.now
+        vm.update(at: start.addingTimeInterval(3.0))
+        XCTAssertTrue(vm.isComplete)
+        XCTAssertEqual(vm.phaseTimeRemaining, 0)
     }
 }
