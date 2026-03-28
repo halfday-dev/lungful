@@ -108,4 +108,35 @@ final class BreathPatternTests: XCTestCase {
         XCTAssertNil(pattern.nextPhase(after: .exhale))
         XCTAssertEqual(pattern.nextPhase(after: .inhale), .exhale)
     }
+
+    // MARK: - BreathPhase Model
+
+    func testPhaseLabels() {
+        XCTAssertEqual(BreathPhase.inhale.label, "Inhale")
+        XCTAssertEqual(BreathPhase.holdIn.label, "Hold In")
+        XCTAssertEqual(BreathPhase.exhale.label, "Exhale")
+        XCTAssertEqual(BreathPhase.holdOut.label, "Hold Out")
+    }
+
+    func testPhaseAccessibilityLabels() {
+        XCTAssertEqual(BreathPhase.inhale.accessibilityLabel, "Inhale")
+        XCTAssertEqual(BreathPhase.holdIn.accessibilityLabel, "Hold In")
+        XCTAssertEqual(BreathPhase.exhale.accessibilityLabel, "Exhale")
+        XCTAssertEqual(BreathPhase.holdOut.accessibilityLabel, "Hold Out")
+    }
+
+    func testPhaseNextSequence() {
+        XCTAssertEqual(BreathPhase.inhale.next, .holdIn)
+        XCTAssertEqual(BreathPhase.holdIn.next, .exhale)
+        XCTAssertEqual(BreathPhase.exhale.next, .holdOut)
+        XCTAssertNil(BreathPhase.holdOut.next)
+    }
+
+    func testPhaseEncodeDecode() throws {
+        for phase in BreathPhase.allCases {
+            let data = try JSONEncoder().encode(phase)
+            let decoded = try JSONDecoder().decode(BreathPhase.self, from: data)
+            XCTAssertEqual(decoded, phase)
+        }
+    }
 }

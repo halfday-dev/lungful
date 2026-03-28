@@ -11,9 +11,9 @@ public enum BreathPhase: String, Codable, CaseIterable, Sendable {
     public var label: String {
         switch self {
         case .inhale:  return "Inhale"
-        case .holdIn:  return "Hold"
+        case .holdIn:  return "Hold In"
         case .exhale:  return "Exhale"
-        case .holdOut: return "Hold"
+        case .holdOut: return "Hold Out"
         }
     }
 

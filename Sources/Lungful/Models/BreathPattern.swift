@@ -21,6 +21,13 @@ public struct BreathPattern: Identifiable, Codable, Sendable {
         holdOutDuration: TimeInterval = 0,
         cycles: Int
     ) {
+        precondition(inhaleDuration >= 0, "Inhale duration must be non-negative")
+        precondition(holdInDuration >= 0, "Hold-in duration must be non-negative")
+        precondition(exhaleDuration >= 0, "Exhale duration must be non-negative")
+        precondition(holdOutDuration >= 0, "Hold-out duration must be non-negative")
+        precondition(cycles >= 1, "Cycles must be at least 1")
+        precondition(inhaleDuration + exhaleDuration > 0, "Pattern must have at least inhale or exhale")
+
         self.id = id
         self.name = name
         self.description = description

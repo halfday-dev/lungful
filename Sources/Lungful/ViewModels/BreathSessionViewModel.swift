@@ -1,5 +1,8 @@
 import Foundation
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// Drives a breathing session: cycles through phases, exposes progress for UI binding.
 /// Designed to be driven by `TimelineView(.animation)` — call `update(at:)` each frame.
@@ -132,6 +135,21 @@ public final class BreathSessionViewModel: ObservableObject {
         phaseProgress = 0.0
         phaseStartDate = date
         pauseElapsed = 0
+        playPhaseHaptic(phase)
+    }
+
+    // MARK: - Haptics
+
+    private func playPhaseHaptic(_ phase: BreathPhase) {
+        #if canImport(UIKit) && !os(macOS)
+        let style: UIImpactFeedbackGenerator.FeedbackStyle = switch phase {
+        case .inhale:  .medium
+        case .holdIn:  .light
+        case .exhale:  .medium
+        case .holdOut: .light
+        }
+        UIImpactFeedbackGenerator(style: style).impactOccurred()
+        #endif
     }
 
     private func advancePhase(at date: Date) {
