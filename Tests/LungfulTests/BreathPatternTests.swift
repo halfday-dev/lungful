@@ -112,17 +112,19 @@ final class BreathPatternTests: XCTestCase {
     // MARK: - BreathPhase Model
 
     func testPhaseLabels() {
+        // Both holds display as "Hold" — the circle and color carry which one.
         XCTAssertEqual(BreathPhase.inhale.label, "Inhale")
-        XCTAssertEqual(BreathPhase.holdIn.label, "Hold In")
+        XCTAssertEqual(BreathPhase.holdIn.label, "Hold")
         XCTAssertEqual(BreathPhase.exhale.label, "Exhale")
-        XCTAssertEqual(BreathPhase.holdOut.label, "Hold Out")
+        XCTAssertEqual(BreathPhase.holdOut.label, "Hold")
     }
 
     func testPhaseAccessibilityLabels() {
+        // VoiceOver keeps the holds distinct — a listener can't see the circle.
         XCTAssertEqual(BreathPhase.inhale.accessibilityLabel, "Inhale")
-        XCTAssertEqual(BreathPhase.holdIn.accessibilityLabel, "Hold In")
+        XCTAssertEqual(BreathPhase.holdIn.accessibilityLabel, "Hold, lungs full")
         XCTAssertEqual(BreathPhase.exhale.accessibilityLabel, "Exhale")
-        XCTAssertEqual(BreathPhase.holdOut.accessibilityLabel, "Hold Out")
+        XCTAssertEqual(BreathPhase.holdOut.accessibilityLabel, "Hold, lungs empty")
     }
 
     func testPhaseNextSequence() {

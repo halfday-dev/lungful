@@ -1,13 +1,18 @@
 import SwiftUI
 
 /// Builder UI for creating a custom breathing pattern.
+/// Builder state persists across launches via `@AppStorage` so the last-used
+/// configuration is always restored. Patterns can be saved to the main list.
+@MainActor
 public struct CustomPatternView: View {
-    @State private var inhaleDuration: Double = 4.0
-    @State private var holdInDuration: Double = 0.0
-    @State private var exhaleDuration: Double = 4.0
-    @State private var holdOutDuration: Double = 0.0
-    @State private var cycles: Int = 6
+    @AppStorage("lungful.builder.inhaleDuration") private var inhaleDuration: Double = 4.0
+    @AppStorage("lungful.builder.holdInDuration") private var holdInDuration: Double = 0.0
+    @AppStorage("lungful.builder.exhaleDuration") private var exhaleDuration: Double = 4.0
+    @AppStorage("lungful.builder.holdOutDuration") private var holdOutDuration: Double = 0.0
+    @AppStorage("lungful.builder.cycles") private var cycles: Int = 6
     @State private var editingPhase: String?
+    @State private var showSaveDialog: Bool = false
+    @State private var patternName: String = ""
 
     public init() {}
 
@@ -108,6 +113,13 @@ public struct CustomPatternView: View {
                     }
                     .disabled(!isValid)
                     .opacity(isValid ? 1.0 : 0.4)
+
+                    // Save — quiet text button below the primary action
+                    Button("Save to list") { showSaveDialog = true }
+                        .font(.system(size: 15, weight: .regular, design: .default))
+                        .foregroundStyle(isValid ? Theme.dust : Theme.shadow)
+                        .buttonStyle(.plain)
+                        .disabled(!isValid)
                 }
                 .padding(24)
             }
@@ -117,6 +129,13 @@ public struct CustomPatternView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         #endif
         .preferredColorScheme(.dark)
+        .alert("save pattern", isPresented: $showSaveDialog) {
+            TextField("Name", text: $patternName)
+            Button("Save") { savePattern() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Saved patterns appear on the main list.")
+        }
         .navigationDestination(for: BreathPattern.self) { pattern in
             BreathSessionView(pattern: pattern)
         }
@@ -158,6 +177,15 @@ public struct CustomPatternView: View {
             holdOutDuration: holdOutDuration,
             cycles: cycles
         )
+    }
+
+    private func savePattern() {
+        let trimmed = patternName.trimmingCharacters(in: .whitespacesAndNewlines)
+        var pattern = buildPattern()
+        pattern.name = trimmed.isEmpty ? "Custom \(compactPhaseSummary)" : trimmed
+        pattern.description = "Saved pattern \u{00B7} \(compactPhaseSummary) \u{00B7} \(cycles) cycles"
+        PatternStore.shared.save(pattern)
+        patternName = ""
     }
 
     private func formattedDuration(_ seconds: TimeInterval) -> String {

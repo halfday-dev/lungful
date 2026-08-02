@@ -1,17 +1,55 @@
 import SwiftUI
 
-/// Single-column list of available breathing patterns.
+/// Single-column list of available breathing patterns — presets, then saved
+/// customs, then the create-your-own card. Locked items (post-trial, before
+/// unlock) stay visible and open the unlock sheet.
+@MainActor
 public struct PatternListView: View {
-    private let patterns = BreathPattern.presets
+    /// Built-in patterns, excluding the "Custom" placeholder card entry.
+    private let presets = BreathPattern.presets.filter { $0.name != "Custom" }
+
+    @ObservedObject private var store = PatternStore.shared
+    @ObservedObject private var access = AccessManager.shared
+    @State private var showUnlock = false
+    @State private var showAbout = false
 
     public init() {}
 
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 4) {
-                LungfulWordmark(size: 28, color: Theme.bone)
+                HStack(alignment: .center) {
+                    LungfulWordmark(size: 28, color: Theme.bone)
 
-                Text("\(patterns.count) patterns")
+                    Spacer()
+
+                    // Proper menu — the old bare ⓘ glyph wasn't discoverable
+                    // (device feedback 2026-07-21).
+                    Menu {
+                        Button {
+                            showAbout = true
+                        } label: {
+                            Label("About lungful", systemImage: "info.circle")
+                        }
+
+                        if access.access != .unlocked {
+                            Button {
+                                showUnlock = true
+                            } label: {
+                                Label("Unlock everything", systemImage: "lock.open")
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "line.3.horizontal")
+                            .font(.system(size: 18, weight: .light))
+                            .foregroundStyle(Theme.dust)
+                            .frame(width: 44, height: 44, alignment: .trailing)
+                            .contentShape(Rectangle())
+                    }
+                    .accessibilityLabel("Menu")
+                }
+
+                Text(subtitle)
                     .font(.system(size: 14, weight: .regular, design: .default))
                     .foregroundStyle(Theme.shadow)
                     .padding(.leading, 2)
@@ -21,16 +59,32 @@ public struct PatternListView: View {
             .padding(.top, 16)
 
             LazyVStack(spacing: 20) {
-                ForEach(patterns) { pattern in
-                    if pattern.name == "Custom" {
-                        NavigationLink(value: "custom") {
-                            CustomCard()
+                ForEach(presets) { pattern in
+                    patternRow(pattern)
+                }
+
+                ForEach(store.savedPatterns) { pattern in
+                    patternRow(pattern)
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                store.delete(pattern)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         }
-                    } else {
-                        NavigationLink(value: pattern.id) {
-                            PatternCard(pattern: pattern)
-                        }
+                }
+
+                if access.canUseBuilder {
+                    NavigationLink(value: "custom") {
+                        CustomCard(locked: false)
                     }
+                } else {
+                    Button {
+                        showUnlock = true
+                    } label: {
+                        CustomCard(locked: true)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
             .frame(maxWidth: 600)
@@ -43,7 +97,7 @@ public struct PatternListView: View {
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .navigationDestination(for: UUID.self) { id in
-            if let pattern = patterns.first(where: { $0.id == id }) {
+            if let pattern = (presets + store.savedPatterns).first(where: { $0.id == id }) {
                 BreathSessionView(pattern: pattern)
             }
         }
@@ -52,6 +106,52 @@ public struct PatternListView: View {
                 CustomPatternView()
             }
         }
+        .sheet(isPresented: $showUnlock) {
+            UnlockView()
+        }
+        .sheet(isPresented: $showAbout) {
+            AboutView()
+        }
+        .task {
+            await StoreService.shared.refresh()
+            access.refresh()
+        }
+        .onAppear {
+            access.refresh()
+        }
+    }
+
+    // MARK: - Rows
+
+    @ViewBuilder
+    private func patternRow(_ pattern: BreathPattern) -> some View {
+        if access.canUse(pattern) {
+            NavigationLink(value: pattern.id) {
+                PatternCard(pattern: pattern, locked: false)
+            }
+        } else {
+            Button {
+                showUnlock = true
+            } label: {
+                PatternCard(pattern: pattern, locked: true)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    // MARK: - Helpers
+
+    private var subtitle: String {
+        let total = presets.count + store.savedPatterns.count
+        switch access.access {
+        case .unlocked:
+            return "\(total) patterns"
+        case .trial(let days):
+            return "\(total) patterns · \(days) day\(days == 1 ? "" : "s") left in trial"
+        case .lapsed:
+            let free = presets.filter { access.canUse($0) }.count
+            return "\(free) of \(total) patterns free · tap a locked one to unlock"
+        }
     }
 }
 
@@ -59,16 +159,24 @@ public struct PatternListView: View {
 
 private struct PatternCard: View {
     let pattern: BreathPattern
+    var locked: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Top row: name + duration badge
+            // Top row: name + lock + duration badge
             HStack(alignment: .top) {
                 Text(pattern.name)
                     .font(.system(size: 20, weight: .medium, design: .default))
                     .foregroundStyle(Theme.bone)
 
                 Spacer()
+
+                if locked {
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 11, weight: .regular))
+                        .foregroundStyle(Theme.shadow)
+                        .padding(.top, 5)
+                }
 
                 // Duration badge
                 Text(formattedDuration(pattern.totalDuration))
@@ -98,6 +206,9 @@ private struct PatternCard: View {
                 .fill(Theme.warmClay)
                 .strokeBorder(Theme.kilnEdge, lineWidth: 1)
         )
+        .opacity(locked ? 0.55 : 1.0)
+        .accessibilityElement(children: .combine)
+        .accessibilityHint(locked ? "Locked. Opens the unlock screen." : "")
     }
 
     private func formattedDuration(_ seconds: TimeInterval) -> String {
@@ -146,11 +257,13 @@ private struct PhaseStrip: View {
 // MARK: - Custom Card
 
 private struct CustomCard: View {
+    var locked: Bool = false
+
     var body: some View {
         VStack(spacing: 8) {
-            Image(systemName: "plus")
+            Image(systemName: locked ? "lock.fill" : "plus")
                 .font(.system(size: 24, weight: .light))
-                .foregroundStyle(Theme.ochre)
+                .foregroundStyle(locked ? Theme.shadow : Theme.ochre)
 
             Text("Custom")
                 .font(.system(size: 15, weight: .light, design: .default))
@@ -160,7 +273,13 @@ private struct CustomCard: View {
         .frame(height: 100)
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(Theme.ochre, style: StrokeStyle(lineWidth: 1, dash: [6, 4]))
+                .strokeBorder(
+                    locked ? Theme.shadow : Theme.ochre,
+                    style: StrokeStyle(lineWidth: 1, dash: [6, 4])
+                )
         )
+        .opacity(locked ? 0.7 : 1.0)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(locked ? "Custom pattern builder. Locked. Opens the unlock screen." : "Create custom pattern")
     }
 }

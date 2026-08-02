@@ -112,7 +112,7 @@ extension BreathPattern {
 
     public static let boxBreathing = BreathPattern(
         name: "Box Breathing",
-        description: "Equal 4-count inhale, hold, exhale, hold. Used by Navy SEALs for focus and calm under pressure.",
+        description: "Equal 4-count inhale, hold, exhale, hold. The steady classic for focus and calm under pressure.",
         inhaleDuration: 4,
         holdInDuration: 4,
         exhaleDuration: 4,

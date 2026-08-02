@@ -1,10 +1,18 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// Full-screen breathing session — circle centered, controls at bottom.
+@MainActor
 public struct BreathSessionView: View {
     @StateObject private var viewModel: BreathSessionViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showCompletionControls: Bool = false
+
+    /// One-time safety note before the first retention-hold session.
+    @AppStorage("lungful.hasSeenRetentionSafetyNote") private var hasSeenRetentionSafetyNote: Bool = false
+    @State private var showSafetyAlert: Bool = false
 
     private let pattern: BreathPattern
 
@@ -39,10 +47,10 @@ public struct BreathSessionView: View {
 
                 Spacer()
 
-                // Breath circle
+                // Breath circle — square, capped at 500pt, shrinks on small screens
                 BreathCircleView(viewModel: viewModel)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 500)
+                    .aspectRatio(1, contentMode: .fit)
+                    .frame(maxWidth: .infinity, maxHeight: 500)
 
                 Spacer()
 
@@ -75,6 +83,23 @@ public struct BreathSessionView: View {
             } else {
                 showCompletionControls = false
             }
+        }
+        // Keep the screen awake during a session — a breathwork timer that
+        // sleeps mid-session is broken.
+        .onChange(of: viewModel.isRunning) { _, running in
+            setIdleTimer(disabled: running)
+        }
+        .onDisappear {
+            setIdleTimer(disabled: false)
+        }
+        .alert("before you begin", isPresented: $showSafetyAlert) {
+            Button("I understand") {
+                hasSeenRetentionSafetyNote = true
+                viewModel.start()
+            }
+            Button("Not now", role: .cancel) {}
+        } message: {
+            Text("Retention breathing can cause dizziness or fainting. Never practice in water, while driving, or standing up. Sit or lie down somewhere safe.")
         }
         .navigationBarBackButtonHidden(viewModel.isRunning)
         #if !os(macOS)
@@ -118,13 +143,29 @@ public struct BreathSessionView: View {
                 Color.clear.frame(height: 20)
             } else {
                 // Pre-session
-                Button("Begin") { viewModel.start() }
+                Button("Begin") { beginTapped() }
                     .font(.system(size: 20, weight: .medium, design: .default))
                     .foregroundStyle(Theme.ochre)
             }
         }
         .font(.system(size: 17, weight: .regular, design: .default))
         .buttonStyle(.plain)
+    }
+
+    // MARK: - Actions
+
+    private func beginTapped() {
+        if pattern.retentionHold && !hasSeenRetentionSafetyNote {
+            showSafetyAlert = true
+        } else {
+            viewModel.start()
+        }
+    }
+
+    private func setIdleTimer(disabled: Bool) {
+        #if canImport(UIKit) && !os(macOS)
+        UIApplication.shared.isIdleTimerDisabled = disabled
+        #endif
     }
 
     // MARK: - Helpers

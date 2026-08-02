@@ -60,8 +60,8 @@ public struct BreathCircleView: View {
 
                 // Count up during retention
                 Text(retentionTimeString)
-                    .font(.system(size: 16, weight: .light, design: .monospaced))
-                    .foregroundStyle(Theme.dust)
+                    .font(.system(size: 32, weight: .light, design: .monospaced))
+                    .foregroundStyle(Theme.bone.opacity(0.8))
                     .monospacedDigit()
             } else if viewModel.isRecoveryHold {
                 Text("Recovery")
@@ -69,8 +69,8 @@ public struct BreathCircleView: View {
                     .foregroundStyle(Theme.bone)
 
                 Text(String(format: "%.1f", viewModel.phaseTimeRemaining))
-                    .font(.system(size: 16, weight: .light, design: .monospaced))
-                    .foregroundStyle(Theme.dust)
+                    .font(.system(size: 32, weight: .light, design: .monospaced))
+                    .foregroundStyle(Theme.bone.opacity(0.8))
                     .contentTransition(.numericText())
                     .monospacedDigit()
             } else {
@@ -84,9 +84,11 @@ public struct BreathCircleView: View {
 
             if viewModel.isRunning && !viewModel.isPaused && !viewModel.isComplete
                 && !viewModel.isRetentionHold && !viewModel.isRecoveryHold {
+                // Large countdown — the "how much longer" answer should be
+                // readable at arm's length mid-session (device feedback 2026-07-21).
                 Text(String(format: "%.1f", viewModel.phaseTimeRemaining))
-                    .font(.system(size: 16, weight: .light, design: .monospaced))
-                    .foregroundStyle(Theme.dust)
+                    .font(.system(size: 32, weight: .light, design: .monospaced))
+                    .foregroundStyle(Theme.bone.opacity(0.8))
                     .contentTransition(.numericText())
                     .monospacedDigit()
             }

@@ -43,19 +43,11 @@ maintain clear space equal to **25% of the ring diameter** on all sides. nothing
 - **tracking:** +2% letter-spacing. the extra air between letters is intentional.
 - **weight:** light only. never regular, never bold.
 
-### the ring as "o"
-at display sizes (32pt+), the breath ring can replace the letter "o" in "lungful":
+### the ring as "o" — RETIRED (2026-07-21)
 
-```
-lungf[ring]l
-```
+the combined treatment (ring replacing a letter in "lungful") is **retired**. on-device testing read it as a typo/oddity rather than a mark ("lungf◯l"). do not use it in-app or in marketing.
 
-rules for this treatment:
-- the ring must be optically centered on the baseline, matching the x-height of the surrounding letters
-- ring height = x-height of the typeface at that size
-- maintain the same tracking on either side of the ring as between other letters
-- only use this at sizes where the ring's variable thickness is clearly visible (32pt+)
-- at small sizes (nav bar, tab bar), use the ring mark alone or the plain text wordmark — never the combined version
+instead: **plain text wordmark**, and the **ring as a standalone mark** — beside, above, or independent of the wordmark, never inside it. the original spacing rules for the standalone ring (clear space, minimum sizes, no distortion) still apply.
 
 ---
 
@@ -149,8 +141,9 @@ apple applies the continuous-corner (squircle) mask automatically. the SVG sourc
 ### in-app
 | location | treatment | size |
 |----------|-----------|------|
-| nav bar (pattern list) | breath ring mark only | 20pt height |
-| about screen | ring + wordmark (combined) | 48pt wordmark |
+| pattern list header | plain text wordmark | 28pt |
+| about screen | standalone ring above plain wordmark (stacked) | 56pt ring, 40pt wordmark |
+| unlock screen | standalone ring | 56pt |
 
 ### app store
 | asset | treatment |
