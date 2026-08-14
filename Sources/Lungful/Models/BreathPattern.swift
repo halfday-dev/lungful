@@ -122,7 +122,7 @@ extension BreathPattern {
 
     public static let relaxation478 = BreathPattern(
         name: "4-7-8 Relaxation",
-        description: "Dr. Andrew Weil's technique. Inhale 4, hold 7, exhale 8. A natural tranquilizer for the nervous system.",
+        description: "Dr. Andrew Weil's technique. Inhale 4, hold 7, exhale 8 — a slow pattern for winding down.",
         inhaleDuration: 4,
         holdInDuration: 7,
         exhaleDuration: 8,
@@ -132,7 +132,7 @@ extension BreathPattern {
 
     public static let coherentBreathing = BreathPattern(
         name: "Coherent Breathing",
-        description: "5.5 seconds in, 5.5 seconds out. Optimizes heart rate variability at ~5.5 breaths per minute.",
+        description: "5.5 seconds in, 5.5 seconds out — the slow, even pace associated with high heart-rate variability.",
         inhaleDuration: 5.5,
         holdInDuration: 0,
         exhaleDuration: 5.5,
@@ -154,7 +154,7 @@ extension BreathPattern {
 
     public static let physiologicalSigh = BreathPattern(
         name: "Physiological Sigh",
-        description: "Double inhale through the nose (2+2s), long 6s exhale. The fastest known way to calm down in real-time.",
+        description: "A long 4-second inhale into a slow 6-second exhale — a quick way to settle in real time.",
         inhaleDuration: 4,
         holdInDuration: 0,
         exhaleDuration: 6,

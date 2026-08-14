@@ -34,7 +34,7 @@ also: delete the stray empty `__test_5` file at repo root (`rm __test_5`).
 
 ```bash
 cd ~/halfday/lungful
-swift test          # expect 70 tests (52 existing + 8 PatternStore + 10 AccessManager) passing
+swift test          # expect 71 tests (52 original + 8 PatternStore + 11 AccessManager) passing
 ```
 
 if anything fails to compile, it'll be in the files above — the changes were written blind. fix or ping claude with the error.

@@ -13,7 +13,7 @@ when App Store Connect asks "Do you or your third-party partners collect data fr
 
 this is true, and it must stay true:
 
-- no network calls of lungful's own anywhere in the codebase. two things touch the network and neither is data collection by us: the halfday.dev link on the about screen (opens in the browser), and **StoreKit** (the $2.99 unlock purchase — Apple's own commerce system, processed under Apple's privacy policy, invisible to us). "Data Not Collected" remains the correct answer with the IAP; purchases via StoreKit do not require any privacy-label disclosure by the developer when no other data is collected.
+- no network calls of lungful's own anywhere in the codebase. two things touch the network and neither is data collection by us: the halfday.dev link on the about screen (opens in the browser), and **StoreKit** (the $4.99 unlock purchase — Apple's own commerce system, processed under Apple's privacy policy, invisible to us). "Data Not Collected" remains the correct answer with the IAP; purchases via StoreKit do not require any privacy-label disclosure by the developer when no other data is collected.
 - no analytics or crash-reporting SDKs
 - no third-party SDKs at all (pure SwiftUI, zero dependencies)
 - no accounts, no identifiers

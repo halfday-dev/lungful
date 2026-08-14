@@ -25,11 +25,11 @@ lungful is a breathwork metronome. pick a pattern, press begin, and breathe with
 
 five patterns, each with a reason to exist:
 
-box breathing — 4-4-4-4. the steady classic for focus under pressure.
-4-7-8 relaxation — dr. andrew weil's natural tranquilizer for the nervous system.
-coherent breathing — 5.5 in, 5.5 out. optimizes heart rate variability.
+box breathing — 4-4-4-4. the military standard for focus under pressure.
+4-7-8 relaxation — dr. andrew weil's slow wind-down pattern.
+coherent breathing — 5.5 in, 5.5 out. the pace associated with high heart-rate variability.
 wim hof power breath — 30 power breaths, an open-ended retention hold, and a recovery breath.
-physiological sigh — double inhale, long exhale. the fastest known way to calm down.
+physiological sigh — a long inhale into a slow exhale. a quick way to settle.
 
 or build your own. set each phase in half-second steps, watch the live preview breathe, and save patterns you want to keep.
 

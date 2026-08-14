@@ -10,6 +10,7 @@ public struct PatternListView: View {
 
     @ObservedObject private var store = PatternStore.shared
     @ObservedObject private var access = AccessManager.shared
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showUnlock = false
     @State private var showAbout = false
 
@@ -118,6 +119,13 @@ public struct PatternListView: View {
         }
         .onAppear {
             access.refresh()
+        }
+        // Pick up trial-day boundaries (and expiry) when the app comes back
+        // to the foreground, not just on view appearance.
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                access.refresh()
+            }
         }
     }
 

@@ -158,4 +158,25 @@ final class AccessManagerTests: XCTestCase {
         )
         XCTAssertFalse(manager.canUse(custom))
     }
+
+    @MainActor
+    func testSavedCustomNamedLikePresetStaysLockedAfterLapse() {
+        // Gating is by preset identity, not name — naming a custom pattern
+        // "Box Breathing" must not make it free.
+        let defaults = makeDefaults()
+        let clock = Clock()
+        let manager = makeManager(defaults: defaults, clock: clock)
+        clock.advance(days: 8)
+        manager.refresh()
+
+        let imposter = BreathPattern(
+            name: "Box Breathing",
+            description: "A saved custom wearing a preset's name.",
+            inhaleDuration: 10,
+            exhaleDuration: 10,
+            cycles: 30
+        )
+        XCTAssertFalse(manager.canUse(imposter))
+        XCTAssertTrue(manager.canUse(.boxBreathing))
+    }
 }

@@ -25,10 +25,13 @@ public final class AccessManager: ObservableObject {
     public static let trialLength: TimeInterval = 7 * 86_400
 
     /// Patterns that stay free forever after the trial lapses.
-    /// Matched by name — preset UUIDs are not stable across launches.
-    public static let freeForeverNames: Set<String> = [
-        BreathPattern.boxBreathing.name,
-        BreathPattern.physiologicalSigh.name
+    /// Matched by preset identity (id), not name — otherwise a saved custom
+    /// pattern named "Box Breathing" would slip through the gate. Preset ids
+    /// are stable within a launch, and both the list and this check reference
+    /// the same static instances.
+    public static let freeForeverIDs: Set<UUID> = [
+        BreathPattern.boxBreathing.id,
+        BreathPattern.physiologicalSigh.id
     ]
 
     private let defaults: UserDefaults
@@ -93,7 +96,7 @@ public final class AccessManager: ObservableObject {
 
     /// Whether a given pattern can be started right now.
     public func canUse(_ pattern: BreathPattern) -> Bool {
-        isFullAccess || Self.freeForeverNames.contains(pattern.name)
+        isFullAccess || Self.freeForeverIDs.contains(pattern.id)
     }
 
     /// The custom pattern builder is part of the paid toolkit.

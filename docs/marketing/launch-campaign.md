@@ -12,7 +12,7 @@
 
 **one sentence:** launch lungful on the App Store with the same motion that worked for rune — an honest product page + blog post on halfday.dev, then a one-day push to HN and reddit — positioned against subscription-fatigue in the breathwork category.
 
-**primary objective (updated 2026-07-18 for the trial/unlock model):** 1,000 installs and 40 unlocks (~$102 net at the Small Business Program's 15% rate) in the first 30 days after approval. installs are the funnel metric, unlocks are the money metric — track both.
+**primary objective (updated 2026-07-18 for the trial/unlock model):** 1,000 installs and 40 unlocks (~$170 net at the Small Business Program's 15% rate) in the first 30 days after approval. installs are the funnel metric, unlocks are the money metric — track both.
 
 **secondary objectives:** halfday.dev uniques break the 54–115/day baseline band on launch day; lungful product page becomes the second-most-visited page on the site; one piece of earned commentary (HN front page not required — a real comment thread is the win).
 
@@ -20,7 +20,7 @@
 
 **primary:** people who already practice breathwork (box, 4-7-8, wim hof) and are annoyed by their current app — the calm/headspace refugee. they know the techniques; they need a timer, not a course. found in: r/breathwork, r/Wim_Hof, r/Meditation, HN (huge overlap with "I hate subscriptions" energy).
 
-**secondary:** the privacy-conscious buyer — the same person who reads halfday's rune content. "Data Not Collected" + no network is a real differentiator they'll pay $2.99 to vote for.
+**secondary:** the privacy-conscious buyer — the same person who reads halfday's rune content. "Data Not Collected" + no network is a real differentiator they'll pay $4.99 to vote for.
 
 **pain points:** subscription fatigue ($70/yr for pre-recorded audio), account walls before first breath, streaks/gamification in a calm app, apps that feel like fintech dashboards.
 
@@ -28,15 +28,15 @@
 
 ## 3. key messages
 
-**core:** lungful is a breathwork metronome — five proven patterns and your own, on a timer that feels like a well-made tool. free for a week, two patterns free forever, $2.99 once for everything. no account. no subscription. no data collected.
+**core:** lungful is a breathwork metronome — five proven patterns and your own, on a timer that feels like a well-made tool. free for a week, two patterns free forever, $4.99 once for everything. no account. no subscription. no data collected.
 
-**model (decided 2026-07-18):** 7-day full-featured trial → lapses to box breathing + physiological sigh free forever → $2.99 non-consumable IAP unlocks the full toolkit permanently. rationale: the whole app is the demo (conversion driven by formed habit, not annoyance), a real free tier keeps ratings/word-of-mouth alive, and StoreKit doesn't touch the Data Not Collected label. free-with-ads was evaluated and rejected — at our scale ads earn ~$10-40/mo and destroy the privacy positioning. full comparison lives in this doc's history + the 2026-07-18 session notes.
+**model (decided 2026-07-18):** 7-day full-featured trial → lapses to box breathing + physiological sigh free forever → $4.99 non-consumable IAP unlocks the full toolkit permanently. rationale: the whole app is the demo (conversion driven by formed habit, not annoyance), a real free tier keeps ratings/word-of-mouth alive, and StoreKit doesn't touch the Data Not Collected label. free-with-ads was evaluated and rejected — at our scale ads earn ~$10-40/mo and destroy the privacy positioning. full comparison lives in this doc's history + the 2026-07-18 session notes.
 
 **supporting:**
 1. *the metronome, not the composer* — breathing techniques are old and public. you don't need content, you need time kept precisely. (proof: five patterns with named provenance — Dr. Weil, Wim Hof, Huberman's physiological sigh, coherent breathing's HRV research.)
 2. *works with your eyes closed* — distinct haptic per phase; the screen stays awake; the circle moves at exactly the pace of your breath. (proof: the haptic language table, breath-matched animation.)
 3. *privacy isn't a feature, it's the architecture* — no network calls, no SDKs, "Data Not Collected" on the store label. (proof: screenshot the privacy label itself.)
-4. *pay once, if ever* — free trial of everything, two patterns free forever, $2.99 one time for the rest. no trial that converts to $69.99/yr. (proof: the pricing screen fits in one sentence.)
+4. *pay once, if ever* — free trial of everything, two patterns free forever, $4.99 one time for the rest. no trial that converts to $69.99/yr. (proof: the pricing screen fits in one sentence.)
 
 **tone by channel:** blog = halfday voice (lowercase, honest, concrete). HN = engineering-forward, lead with "no network, pure SwiftUI, pay-once" and the design constraints. reddit = community-member-first, lead with the technique support (retention hold with count-up timer), mention it's yours once, in comments.
 
@@ -53,7 +53,7 @@ all owned/earned, $0 paid. effort levels for one person.
 | reddit (r/breathwork, r/Wim_Hof) | exact-audience communities; retention-hold feature is genuinely relevant to r/Wim_Hof | native posts, not link drops; check each sub's self-promo rules first | low-medium |
 | App Store search (ASO) | "box breathing timer", "breathing app no subscription" | keywords field (done); iterate post-launch on what converts | low |
 
-**deliberately skipped:** paid ads (wrong economics at $2.99), influencer outreach (no leverage yet), Product Hunt (optional wave-2 experiment if launch week goes well — don't split launch-day attention), press (no story yet; "solo dev ships breathing app" isn't coverage, 1,000 downloads might be).
+**deliberately skipped:** paid ads (wrong economics at $4.99), influencer outreach (no leverage yet), Product Hunt (optional wave-2 experiment if launch week goes well — don't split launch-day attention), press (no story yet; "solo dev ships breathing app" isn't coverage, 1,000 downloads might be).
 
 ## 5. calendar (keyed to approval day = day 0)
 
@@ -86,7 +86,7 @@ all owned/earned, $0 paid. effort levels for one person.
 **Show HN draft (edit to taste):**
 > **title:** Show HN: Lungful – a breathwork metronome (no subscription, no accounts, no data)
 >
-> **first comment:** I built this because every breathing app I tried wanted an account, a subscription, and a streak before letting me breathe for four minutes. Lungful is the opposite bet: the techniques (box, 4-7-8, coherent, Wim Hof, physiological sigh) are old and public — what you need is a precise timer. Pure SwiftUI, zero dependencies, no network calls of its own, so the App Store privacy label is "Data Not Collected." The circle animates at exactly the pace of each breath phase with a distinct haptic per phase, so it works eyes-closed. Wim Hof mode has an open-ended retention hold that counts up until you release it. Pricing is the whole model in one sentence: everything free for 7 days, two patterns free forever, $2.99 once unlocks the rest — no subscription. (Yes, the trial resets if you reinstall. At $2.99 I'm not building infrastructure to fight that.) Happy to answer anything about the design system or the economics.
+> **first comment:** I built this because every breathing app I tried wanted an account, a subscription, and a streak before letting me breathe for four minutes. Lungful is the opposite bet: the techniques (box, 4-7-8, coherent, Wim Hof, physiological sigh) are old and public — what you need is a precise timer. Pure SwiftUI, zero dependencies, no network calls of its own, so the App Store privacy label is "Data Not Collected." The circle animates at exactly the pace of each breath phase with a distinct haptic per phase, so it works eyes-closed. Wim Hof mode has an open-ended retention hold that counts up until you release it. Pricing is the whole model in one sentence: everything free for 7 days, two patterns free forever, $4.99 once unlocks the rest — no subscription. (Yes, the trial resets if you reinstall. At $4.99 I'm not building infrastructure to fight that.) Happy to answer anything about the design system or the economics.
 
 ## 7. metrics
 
@@ -103,7 +103,7 @@ no new analytics infra — everything above is already measurable. log results i
 
 ## 8. budget
 
-$0 media. real costs already sunk or committed: Apple Developer $99/yr, T's time. **one action item with money attached:** after the paid app is set up, enroll in the **App Store Small Business Program** (developer.apple.com → reduces Apple's cut from 30% to 15% under $1M/yr — that's $2.54 vs $2.09 per copy; it does not apply retroactively, so do it before launch).
+$0 media. real costs already sunk or committed: Apple Developer $99/yr, T's time. **one action item with money attached:** after the paid app is set up, enroll in the **App Store Small Business Program** (developer.apple.com → reduces Apple's cut from 30% to 15% under $1M/yr — that's $4.24 vs $3.49 per copy; it does not apply retroactively, so do it before launch).
 
 ## 9. risks
 

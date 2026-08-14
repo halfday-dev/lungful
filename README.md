@@ -2,7 +2,7 @@
 
 An iPad-first breathwork app built with SwiftUI. Universal (iPhone + iPad), dark-only, no dependencies, no network calls of its own.
 
-Pricing model: 7-day full trial → Box Breathing + Physiological Sigh free forever → $2.99 one-time IAP ("Full Toolkit") unlocks everything.
+Pricing model: 7-day full trial → Box Breathing + Physiological Sigh free forever → $4.99 one-time IAP ("Full Toolkit") unlocks everything.
 
 ## Patterns
 

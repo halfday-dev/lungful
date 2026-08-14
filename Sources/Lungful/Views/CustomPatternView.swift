@@ -99,20 +99,19 @@ public struct CustomPatternView: View {
                         .foregroundStyle(Theme.dust)
                         .frame(maxWidth: .infinity, alignment: .center)
 
-                    // Start button — solid ochre fill, black text, no gradient
-                    NavigationLink(value: buildPattern()) {
-                        Text("Start")
-                            .font(.system(size: 20, weight: .semibold, design: .default))
-                            .foregroundStyle(.black)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(
-                                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .fill(Theme.ochre)
-                            )
+                    // Start button — solid ochre fill, black text, no gradient.
+                    // Only construct the NavigationLink (and thus the pattern)
+                    // when valid: building a pattern with inhale + exhale both 0
+                    // would trip BreathPattern's precondition and crash — and
+                    // since builder state is @AppStorage, it would crash-loop.
+                    if isValid {
+                        NavigationLink(value: buildPattern()) {
+                            startButtonLabel
+                        }
+                    } else {
+                        startButtonLabel
+                            .opacity(0.4)
                     }
-                    .disabled(!isValid)
-                    .opacity(isValid ? 1.0 : 0.4)
 
                     // Save — quiet text button below the primary action
                     Button("Save to list") { showSaveDialog = true }
@@ -142,6 +141,18 @@ public struct CustomPatternView: View {
     }
 
     // MARK: - Computed
+
+    private var startButtonLabel: some View {
+        Text("Start")
+            .font(.system(size: 20, weight: .semibold, design: .default))
+            .foregroundStyle(.black)
+            .frame(maxWidth: .infinity)
+            .frame(height: 56)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Theme.ochre)
+            )
+    }
 
     private var isValid: Bool {
         inhaleDuration + exhaleDuration > 0

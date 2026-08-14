@@ -1,10 +1,10 @@
 # lungful privacy policy
 
-*publish this page at halfday.dev (e.g. /lungful/privacy) before submission — App Store Connect requires a live privacy policy URL.*
+*Published at **https://halfday.dev/lungful/privacy** — this is the URL to paste into App Store Connect. Source of truth is `env-validator/src/pages/lungful/privacy.astro`; keep the two in sync.*
 
 ---
 
-**effective date: [set on publish]**
+**effective date: 2026-08-01**
 
 lungful collects no data. this page is short because there is nothing to disclose.
 

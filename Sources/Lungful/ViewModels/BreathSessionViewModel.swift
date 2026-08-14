@@ -54,6 +54,12 @@ public final class BreathSessionViewModel: ObservableObject {
         self.pattern = pattern
     }
 
+    deinit {
+        // Belt-and-braces: the timer holds self weakly, but an invalidated
+        // timer shouldn't outlive the session it was driving.
+        displayTimer?.invalidate()
+    }
+
     // MARK: - Public Methods
 
     public func start() {
@@ -68,7 +74,9 @@ public final class BreathSessionViewModel: ObservableObject {
     public func pause() {
         guard isRunning, !isPaused else { return }
         isPaused = true
-        pauseElapsed = lastUpdateDate.timeIntervalSince(phaseStartDate)
+        // Clamped: pausing before the first timer tick would otherwise yield
+        // a negative offset (lastUpdateDate predates start()).
+        pauseElapsed = max(0, lastUpdateDate.timeIntervalSince(phaseStartDate))
         stopTimer()
     }
 

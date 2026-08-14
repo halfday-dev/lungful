@@ -43,10 +43,10 @@ public struct AboutView: View {
                             .foregroundStyle(Theme.bone)
 
                         patternInfo("Box Breathing", "equal 4-counts in, hold, out, hold. the steady classic for focus under pressure.")
-                        patternInfo("4-7-8 Relaxation", "dr. andrew weil's wind-down: in 4, hold 7, out 8. a natural tranquilizer for the nervous system.")
-                        patternInfo("Coherent Breathing", "5.5 seconds in, 5.5 out — about 5.5 breaths per minute, the heart-rate-variability sweet spot.")
+                        patternInfo("4-7-8 Relaxation", "dr. andrew weil's wind-down: in 4, hold 7, out 8.")
+                        patternInfo("Coherent Breathing", "5.5 in, 5.5 out — the slow, even pace associated with high heart-rate variability.")
                         patternInfo("Wim Hof Power Breath", "30 strong breaths, an open-ended retention hold, then a 15-second recovery breath.")
-                        patternInfo("Physiological Sigh", "double inhale through the nose, long exhale. the fastest known way to calm down.")
+                        patternInfo("Physiological Sigh", "a long inhale into a slow exhale — a quick way to settle.")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(20)

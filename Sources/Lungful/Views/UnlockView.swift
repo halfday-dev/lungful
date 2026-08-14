@@ -1,6 +1,8 @@
 import SwiftUI
 
 /// The unlock screen — one honest sheet, no countdown theater.
+/// Every purchase/restore outcome is visible: errors alert, an unreachable
+/// App Store disables the button and says so, success dismisses the sheet.
 @MainActor
 public struct UnlockView: View {
     @ObservedObject private var store = StoreService.shared
@@ -50,20 +52,39 @@ public struct UnlockView: View {
                         )
                 }
                 .buttonStyle(.plain)
-                .disabled(store.purchaseInFlight)
-                .opacity(store.purchaseInFlight ? 0.6 : 1.0)
+                .disabled(purchaseDisabled)
+                .opacity(purchaseDisabled ? 0.5 : 1.0)
 
-                Text("one-time purchase · no subscription")
-                    .font(.system(size: 12, weight: .light, design: .monospaced))
-                    .foregroundStyle(Theme.shadow)
-                    .padding(.top, 12)
+                if store.unlockProduct == nil {
+                    // Product didn't load — offline, or the App Store is
+                    // unreachable. Say so instead of a dead button.
+                    Text("can't reach the App Store right now — check your connection")
+                        .font(.system(size: 12, weight: .light, design: .monospaced))
+                        .foregroundStyle(Theme.shadow)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 12)
 
-                Button("Restore Purchases") {
+                    Button("Try Again") {
+                        Task { await store.refresh() }
+                    }
+                    .font(.system(size: 14, weight: .regular, design: .default))
+                    .foregroundStyle(Theme.dust)
+                    .buttonStyle(.plain)
+                    .padding(.top, 10)
+                } else {
+                    Text("one-time purchase · no subscription")
+                        .font(.system(size: 12, weight: .light, design: .monospaced))
+                        .foregroundStyle(Theme.shadow)
+                        .padding(.top, 12)
+                }
+
+                Button(store.restoreInFlight ? "Restoring…" : "Restore Purchases") {
                     Task { await store.restore() }
                 }
                 .font(.system(size: 14, weight: .regular, design: .default))
                 .foregroundStyle(Theme.dust)
                 .buttonStyle(.plain)
+                .disabled(store.restoreInFlight)
                 .padding(.top, 20)
 
                 Text("box breathing & the physiological sigh stay free forever.")
@@ -85,11 +106,54 @@ public struct UnlockView: View {
                 dismiss()
             }
         }
+        .alert(feedbackTitle, isPresented: feedbackShown) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(feedbackMessage)
+        }
+    }
+
+    // MARK: - Feedback
+
+    private var feedbackShown: Binding<Bool> {
+        Binding(
+            get: { store.feedback != nil },
+            set: { if !$0 { store.feedback = nil } }
+        )
+    }
+
+    private var feedbackTitle: String {
+        switch store.feedback {
+        case .purchaseFailed:   return "purchase didn't complete"
+        case .restoreFailed:    return "restore didn't complete"
+        case .nothingToRestore: return "no purchase found"
+        case nil:               return ""
+        }
+    }
+
+    private var feedbackMessage: String {
+        switch store.feedback {
+        case .purchaseFailed(let detail):
+            return "You weren't charged. \(detail)"
+        case .restoreFailed(let detail):
+            return detail
+        case .nothingToRestore:
+            return "There's no previous purchase on this Apple ID. If you bought the unlock with a different Apple ID, sign in to it in Settings and restore again."
+        case nil:
+            return ""
+        }
     }
 
     // MARK: - Helpers
 
+    private var purchaseDisabled: Bool {
+        store.purchaseInFlight || store.unlockProduct == nil
+    }
+
     private var purchaseLabel: String {
+        if store.purchaseInFlight {
+            return "Unlocking…"
+        }
         if let price = store.unlockProduct?.displayPrice {
             return "Unlock · \(price)"
         }

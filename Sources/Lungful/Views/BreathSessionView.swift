@@ -8,6 +8,7 @@ import UIKit
 public struct BreathSessionView: View {
     @StateObject private var viewModel: BreathSessionViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showCompletionControls: Bool = false
 
     /// One-time safety note before the first retention-hold session.
@@ -88,6 +89,15 @@ public struct BreathSessionView: View {
         // sleeps mid-session is broken.
         .onChange(of: viewModel.isRunning) { _, running in
             setIdleTimer(disabled: running)
+        }
+        // Backgrounding interrupts the breath anyway — pause instead of
+        // fast-forwarding through missed phases (and their haptics) on return.
+        // The user resumes deliberately.
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active && viewModel.isRunning && !viewModel.isPaused
+                && !viewModel.isRetentionHold {
+                viewModel.pause()
+            }
         }
         .onDisappear {
             setIdleTimer(disabled: false)
