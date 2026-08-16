@@ -12,7 +12,7 @@ public struct BreathPattern: Identifiable, Codable, Sendable {
     public var cycles: Int
 
     /// When true, after all cycles complete the session enters an open-ended holdOut
-    /// that counts up until the user taps to release (e.g. Wim Hof retention hold).
+    /// that counts up until the user taps to release (e.g. the Dutch Power Breath retention hold).
     public var retentionHold: Bool
 
     /// After the retention hold, inhale and hold for this duration (recovery breath).
@@ -122,7 +122,7 @@ extension BreathPattern {
 
     public static let relaxation478 = BreathPattern(
         name: "4-7-8 Relaxation",
-        description: "Dr. Andrew Weil's technique. Inhale 4, hold 7, exhale 8 — a slow pattern for winding down.",
+        description: "Inhale 4, hold 7, exhale 8 — a slow pattern for winding the nervous system down.",
         inhaleDuration: 4,
         holdInDuration: 7,
         exhaleDuration: 8,
@@ -131,7 +131,7 @@ extension BreathPattern {
     )
 
     public static let coherentBreathing = BreathPattern(
-        name: "Coherent Breathing",
+        name: "Resonant Breathing",
         description: "5.5 seconds in, 5.5 seconds out — the slow, even pace associated with high heart-rate variability.",
         inhaleDuration: 5.5,
         holdInDuration: 0,
@@ -141,7 +141,7 @@ extension BreathPattern {
     )
 
     public static let wimHof = BreathPattern(
-        name: "Wim Hof Power Breath",
+        name: "Dutch Power Breath",
         description: "30 rapid breaths, then exhale and hold as long as you can, then recover with a 15-second inhale hold.",
         inhaleDuration: 2,
         holdInDuration: 0,

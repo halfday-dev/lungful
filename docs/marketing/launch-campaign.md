@@ -18,7 +18,7 @@
 
 ## 2. audience
 
-**primary:** people who already practice breathwork (box, 4-7-8, wim hof) and are annoyed by their current app — the calm/headspace refugee. they know the techniques; they need a timer, not a course. found in: r/breathwork, r/Wim_Hof, r/Meditation, HN (huge overlap with "I hate subscriptions" energy).
+**primary:** people who already practice breathwork (box, 4-7-8, retention work) and are annoyed by their current app — the calm/headspace refugee. they know the techniques; they need a timer, not a course. found in: r/breathwork, r/Wim_Hof, r/Meditation, HN (huge overlap with "I hate subscriptions" energy).
 
 **secondary:** the privacy-conscious buyer — the same person who reads halfday's rune content. "Data Not Collected" + no network is a real differentiator they'll pay $4.99 to vote for.
 
@@ -33,7 +33,7 @@
 **model (decided 2026-07-18):** 7-day full-featured trial → lapses to box breathing + physiological sigh free forever → $4.99 non-consumable IAP unlocks the full toolkit permanently. rationale: the whole app is the demo (conversion driven by formed habit, not annoyance), a real free tier keeps ratings/word-of-mouth alive, and StoreKit doesn't touch the Data Not Collected label. free-with-ads was evaluated and rejected — at our scale ads earn ~$10-40/mo and destroy the privacy positioning. full comparison lives in this doc's history + the 2026-07-18 session notes.
 
 **supporting:**
-1. *the metronome, not the composer* — breathing techniques are old and public. you don't need content, you need time kept precisely. (proof: five patterns with named provenance — Dr. Weil, Wim Hof, Huberman's physiological sigh, coherent breathing's HRV research.)
+1. *the metronome, not the composer* — breathing techniques are old and public. you don't need content, you need time kept precisely. (proof: five patterns with real lineage, described generically in-app — named-person and trademarked branding removed 2026-08-14 for IP hygiene; editorial references in the blog stay nominative.)
 2. *works with your eyes closed* — distinct haptic per phase; the screen stays awake; the circle moves at exactly the pace of your breath. (proof: the haptic language table, breath-matched animation.)
 3. *privacy isn't a feature, it's the architecture* — no network calls, no SDKs, "Data Not Collected" on the store label. (proof: screenshot the privacy label itself.)
 4. *pay once, if ever* — free trial of everything, two patterns free forever, $4.99 one time for the rest. no trial that converts to $69.99/yr. (proof: the pricing screen fits in one sentence.)
@@ -86,7 +86,7 @@ all owned/earned, $0 paid. effort levels for one person.
 **Show HN draft (edit to taste):**
 > **title:** Show HN: Lungful – a breathwork metronome (no subscription, no accounts, no data)
 >
-> **first comment:** I built this because every breathing app I tried wanted an account, a subscription, and a streak before letting me breathe for four minutes. Lungful is the opposite bet: the techniques (box, 4-7-8, coherent, Wim Hof, physiological sigh) are old and public — what you need is a precise timer. Pure SwiftUI, zero dependencies, no network calls of its own, so the App Store privacy label is "Data Not Collected." The circle animates at exactly the pace of each breath phase with a distinct haptic per phase, so it works eyes-closed. Wim Hof mode has an open-ended retention hold that counts up until you release it. Pricing is the whole model in one sentence: everything free for 7 days, two patterns free forever, $4.99 once unlocks the rest — no subscription. (Yes, the trial resets if you reinstall. At $4.99 I'm not building infrastructure to fight that.) Happy to answer anything about the design system or the economics.
+> **first comment:** I built this because every breathing app I tried wanted an account, a subscription, and a streak before letting me breathe for four minutes. Lungful is the opposite bet: the techniques (box, 4-7-8, resonant, power-breath retention, physiological sigh) are old and public — what you need is a precise timer. Pure SwiftUI, zero dependencies, no network calls of its own, so the App Store privacy label is "Data Not Collected." The circle animates at exactly the pace of each breath phase with a distinct haptic per phase, so it works eyes-closed. The Dutch Power Breath mode has an open-ended retention hold that counts up until you release it. Pricing is the whole model in one sentence: everything free for 7 days, two patterns free forever, $4.99 once unlocks the rest — no subscription. (Yes, the trial resets if you reinstall. At $4.99 I'm not building infrastructure to fight that.) Happy to answer anything about the design system or the economics.
 
 ## 7. metrics
 

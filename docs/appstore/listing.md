@@ -17,31 +17,31 @@ if "lungful" is taken as a bare name, fall back to: **lungful — breathwork** (
 
 ## promotional text (170 char max, editable without review)
 
-every pattern free for 7 days. box breathing + the physiological sigh free forever. one $2.99 purchase unlocks the rest — no subscription, no account, no data collected. (166 chars)
+everything free for 7 days. two patterns free forever. $4.99 once unlocks the rest — no subscription, no account, no data collected. (132 chars)
 
 ## description
 
-lungful is a breathwork metronome. pick a pattern, press begin, and breathe with a circle that expands and contracts at exactly the pace of your breath — with a distinct haptic for each phase, so it works with your eyes closed.
+lungful is a breathing timer. pick a pattern, press begin, and follow a circle that grows and shrinks at the real pace of the breath. each phase lands with its own haptic, so it works with your eyes closed.
 
-five patterns, each with a reason to exist:
+the five patterns:
 
-box breathing — 4-4-4-4. the military standard for focus under pressure.
-4-7-8 relaxation — dr. andrew weil's slow wind-down pattern.
-coherent breathing — 5.5 in, 5.5 out. the pace associated with high heart-rate variability.
-wim hof power breath — 30 power breaths, an open-ended retention hold, and a recovery breath.
-physiological sigh — a long inhale into a slow exhale. a quick way to settle.
+box breathing — 4-4-4-4. steady, good for focus.
+4-7-8 — in 4, hold 7, out 8. the classic wind-down.
+resonant breathing — 5.5 in, 5.5 out. the slow, even pace people use for heart-rate variability work.
+dutch power breath — 30 big breaths, an open hold you release when you're ready, then a recovery breath.
+physiological sigh — long inhale, slow exhale. a quick reset.
 
-or build your own. set each phase in half-second steps, watch the live preview breathe, and save patterns you want to keep.
+you can also build your own patterns in half-second steps and save the ones you like.
 
-everything is free for your first seven days. after that, box breathing and the physiological sigh stay free forever, and a single $2.99 purchase unlocks the full toolkit — every pattern, the builder, and whatever we add next. permanently. no subscription.
+pricing is simple: everything is free for your first 7 days. after that, box breathing and the physiological sigh stay free forever. $4.99 unlocks everything else, permanently. no subscription.
 
-what lungful doesn't do: accounts, subscriptions, streaks, coach voices, analytics, or network calls of its own. everything stays on your device. the screen stays awake during a session and the design stays out of your way — earth tones, one circle, your breath.
+no accounts, no streaks, no coach voices, no analytics. lungful makes no network calls of its own, which is why the privacy label reads Data Not Collected. your patterns stay on your phone, and the screen stays awake while you breathe.
 
 made by halfday.
 
 ## keywords (100 char max)
 
-breathwork,breathing,box breathing,4-7-8,wim hof,coherent,hrv,calm,focus,meditation,sleep (89 chars)
+breathwork,breathing,box breathing,4-7-8,breath hold,resonant,hrv,calm,focus,meditation,sleep,tummo (99 chars)
 
 ## categories
 
@@ -61,7 +61,7 @@ breathwork,breathing,box breathing,4-7-8,wim hof,coherent,hrv,calm,focus,meditat
 | reference name | Lungful Full Toolkit |
 | display name (≤30) | Full Toolkit |
 | description (≤45) | All patterns, the builder, forever. |
-| price | $2.99 (Tier 3) |
+| price | $4.99 (Tier 5) |
 | review screenshot | screenshot of the unlock screen (required for IAP review) |
 
 submit the IAP **with** the 1.0.0 app version — first IAP must be reviewed alongside an app binary.
@@ -74,10 +74,10 @@ submit the IAP **with** the 1.0.0 app version — first IAP must be reviewed alo
 
 - support URL: https://halfday.dev
 - marketing URL (optional): https://halfday.dev
-- privacy policy URL (required): publish `privacy-policy.md` at e.g. https://halfday.dev/lungful/privacy — **must be live before submission**
+- privacy policy URL (required): **https://halfday.dev/lungful/privacy** — live as of 2026-08-14, legal-reviewed (retention/deletion + third-party language per App Review 5.1.1(i))
 
 ## review notes (paste into App Review notes field)
 
-lungful is a breathing timer. it makes no medical or treatment claims; a safety disclaimer is shown before the first retention-hold session (Wim Hof pattern) and on the about screen. the app makes no network calls of its own, has no accounts, and collects no data.
+lungful is a breathing timer. it makes no medical or treatment claims; a safety disclaimer is shown before the first retention-hold session (Dutch Power Breath pattern) and on the about screen. the app makes no network calls of its own, has no accounts, and collects no data.
 
-monetization: all features are available free for 7 days after first launch (trial state is stored locally). after the trial, two patterns remain free permanently; a single **non-consumable** in-app purchase ("Full Toolkit", $2.99, one-time — NOT a subscription) unlocks all features permanently. a Restore Purchases button is on the unlock screen, reachable by tapping any locked pattern. no demo account is needed — the app launches into the full-featured trial.
+monetization: all features are available free for 7 days after first launch (trial state is stored locally). after the trial, two patterns remain free permanently; a single **non-consumable** in-app purchase ("Full Toolkit", $4.99, one-time — NOT a subscription) unlocks all features permanently. a Restore Purchases button is on the unlock screen, reachable by tapping any locked pattern. no demo account is needed — the app launches into the full-featured trial.

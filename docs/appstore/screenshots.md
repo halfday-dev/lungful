@@ -18,7 +18,7 @@ App Store Connect scales these down for smaller devices automatically. capture 5
 
 1. **pattern list** — home screen, all five presets + custom card visible. shows the phase-strip cards and wordmark. (the anchor shot: this is the "intentional product" frame.)
 2. **session, mid-inhale** — box breathing, circle ~80% expanded, sage phase color, "Inhale" label with countdown. start a session and screenshot at ~3s into an inhale.
-3. **wim hof retention** — the "Hold" screen with the count-up timer and Release control. the most distinctive feature; competitors don't have open-ended retention.
+3. **dutch power breath retention** — the "Hold" screen with the count-up timer and Release control. the most distinctive feature; competitors don't have open-ended retention.
 4. **custom builder** — with one phase wheel open (tap a duration) so the live preview circle + tappable numbers + summary line are all visible.
 5. **completion** — the "Complete" moment (circle contracted at 0.5, bone label) with Again/Done controls faded in.
 

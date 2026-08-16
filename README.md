@@ -7,9 +7,9 @@ Pricing model: 7-day full trial → Box Breathing + Physiological Sigh free fore
 ## Patterns
 
 - **Box Breathing** — 4-4-4-4, 8 cycles (focus)
-- **4-7-8 Relaxation** — inhale 4, hold 7, exhale 8 (Dr. Andrew Weil)
-- **Coherent Breathing** — 5.5 in, 5.5 out, 10 cycles (HRV optimization)
-- **Wim Hof Power Breath** — 30 power breaths + retention hold + recovery breath
+- **4-7-8 Relaxation** — inhale 4, hold 7, exhale 8 (wind-down)
+- **Resonant Breathing** — 5.5 in, 5.5 out, 10 cycles (HRV)
+- **Dutch Power Breath** — 30 power breaths + retention hold + recovery breath
 - **Physiological Sigh** — double inhale + long exhale, 5 cycles (quick calm)
 - **Custom** — build your own; saved patterns persist on the main list
 
