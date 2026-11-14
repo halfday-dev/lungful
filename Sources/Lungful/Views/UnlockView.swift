@@ -28,10 +28,19 @@ public struct UnlockView: View {
                     .foregroundStyle(Theme.bone)
                     .padding(.top, 24)
 
+                if case .trial(let days) = access.access {
+                    Text(trialLine(daysRemaining: days))
+                        .font(.system(size: 13, weight: .light, design: .monospaced))
+                        .foregroundStyle(Theme.ochre.opacity(0.85))
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 10)
+                }
+
                 VStack(alignment: .leading, spacing: 12) {
-                    unlockLine("all five breathing patterns")
-                    unlockLine("the custom pattern builder")
-                    unlockLine("saved patterns")
+                    unlockLine("4-7-8 Relaxation")
+                    unlockLine("Resonant Breathing")
+                    unlockLine("Dutch Power Breath")
+                    unlockLine("the custom pattern builder & saved patterns")
                     unlockLine("everything halfday adds next")
                 }
                 .padding(.top, 32)
@@ -72,7 +81,7 @@ public struct UnlockView: View {
                     .buttonStyle(.plain)
                     .padding(.top, 10)
                 } else {
-                    Text("one-time purchase · no subscription")
+                    Text("one-time purchase · yours forever · no subscription")
                         .font(.system(size: 12, weight: .light, design: .monospaced))
                         .foregroundStyle(Theme.shadow)
                         .padding(.top, 12)
@@ -87,7 +96,7 @@ public struct UnlockView: View {
                 .disabled(store.restoreInFlight)
                 .padding(.top, 20)
 
-                Text("box breathing & the physiological sigh stay free forever.")
+                Text("box breathing & the physiological sigh stay free forever — no purchase needed.")
                     .font(.system(size: 13, weight: .light, design: .default))
                     .foregroundStyle(Theme.shadow)
                     .multilineTextAlignment(.center)
@@ -145,6 +154,12 @@ public struct UnlockView: View {
     }
 
     // MARK: - Helpers
+
+    private func trialLine(daysRemaining days: Int) -> String {
+        days == 1
+            ? "everything is unlocked during your trial — last day"
+            : "everything is unlocked during your trial — \(days) days left"
+    }
 
     private var purchaseDisabled: Bool {
         store.purchaseInFlight || store.unlockProduct == nil

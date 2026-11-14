@@ -27,6 +27,7 @@ new/changed since the 2026-03-28 commit:
 | app shell | `App/` (new), `project.yml` (new) | @main entry, Info.plist config, privacy manifest, icon + launch color assets |
 | trial + unlock (added 2026-07-18) | `Sources/Lungful/Models/AccessManager.swift`, `Models/StoreService.swift`, `Views/UnlockView.swift` (all new), `PatternListView.swift` | 7-day full trial → lapses to Box + Physiological Sigh free forever → $2.99 non-consumable IAP unlocks everything. locked cards stay visible and open the unlock sheet |
 | store kit | `docs/appstore/` (new) | this folder |
+| beta fixes (added 2026-08-17) | `Sources/Lungful/Resources/*.wav` (new), `Models/SoundPlayer.swift` (new), `ViewModels/BreathSessionViewModel.swift`, `Views/BreathSessionView.swift`, `Views/UnlockView.swift`, `Views/AboutView.swift`, `Package.swift`, `Tests/LungfulTests/SoundPlayerTests.swift` (new) | phase tones (the only non-visual cue on iPad — no haptic engine), speaker toggle on session screen, concrete unlock sheet with trial-days line, about screen how-it-works/tips/support |
 
 also: delete the stray empty `__test_5` file at repo root (`rm __test_5`).
 
@@ -34,7 +35,7 @@ also: delete the stray empty `__test_5` file at repo root (`rm __test_5`).
 
 ```bash
 cd ~/halfday/lungful
-swift test          # expect 71 tests (52 original + 8 PatternStore + 11 AccessManager) passing
+swift test          # expect 73 tests (52 original + 8 PatternStore + 11 AccessManager + 2 SoundPlayer) passing
 ```
 
 if anything fails to compile, it'll be in the files above — the changes were written blind. fix or ping claude with the error.
@@ -64,6 +65,9 @@ the checklist that matters, in order of what would embarrass us:
 - [ ] Restore Purchases works after deleting + reinstalling (sandbox)
 - [ ] screen stays awake through a full coherent breathing session (~2 min hands-off)
 - [ ] haptics: distinct medium/rigid/soft per phase, nothing on hold-out, success on completion
+- [ ] sounds (test on the iPad especially — no haptic engine there): rising tone on inhale, single strike on hold, falling tone on exhale, silence on hold-out, two-note resolve on completion
+- [ ] speaker toggle (top-right of session screen) mutes/unmutes and the choice survives relaunch
+- [ ] tones play with the ring switch silenced, and mix over background music instead of stopping it
 - [ ] wim hof: safety alert appears once, never again; retention counts up; Release → 15s recovery → complete
 - [ ] custom builder: set a pattern, force-quit, relaunch → values restored
 - [ ] save a named pattern → appears on list → survives relaunch → long-press deletes it
@@ -76,7 +80,7 @@ the checklist that matters, in order of what would embarrass us:
 
 1. appstoreconnect.apple.com → My Apps → **+** → New App: platform iOS, name **lungful** (fallback in `listing.md` if taken), primary language EN, bundle id `dev.halfday.lungful`, SKU `lungful-001`
 2. paste everything from **`listing.md`** (description, subtitle, keywords, promo text, categories, age rating, review notes)
-3. **create the in-app purchase** — In-App Purchases → **+** → Non-Consumable, all fields from the table in `listing.md` (product id `dev.halfday.lungful.unlock` must match the code exactly), price $2.99, upload the unlock-screen screenshot for IAP review, and attach the IAP to the 1.0.0 version so it's reviewed with the binary
+3. **create the in-app purchase** — In-App Purchases → **+** → Non-Consumable, all fields from the table in `listing.md` (product id `dev.halfday.lungful.unlock` must match the code exactly), price $4.99, upload the unlock-screen screenshot for IAP review, and attach the IAP to the 1.0.0 version so it's reviewed with the binary
 4. App Privacy → answers from **`privacy-labels.md`** (Data Not Collected — the IAP doesn't change this)
 5. **publish the privacy policy** from `privacy-policy.md` on halfday.dev and enter its URL (required field — do this before submitting)
 6. pricing: app price **Free** (revenue is the IAP)
@@ -99,4 +103,4 @@ the checklist that matters, in order of what would embarrass us:
 
 ---
 
-*open product questions parked for v1.1: session history (deliberately excluded from v1 — "no streaks" is the positioning), sound cues for eyes-closed sessions, Apple Watch companion, and the AI meditation "composer" idea (see docs/specs/meditation-app-idea.md — separate product decision).*
+*open product questions parked for v1.1: session history (deliberately excluded from v1 — "no streaks" is the positioning), Apple Watch companion, and the AI meditation "composer" idea (see docs/specs/meditation-app-idea.md — separate product decision).*

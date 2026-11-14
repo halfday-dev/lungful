@@ -21,7 +21,7 @@ everything free for 7 days. two patterns free forever. $4.99 once unlocks the re
 
 ## description
 
-lungful is a breathing timer. pick a pattern, press begin, and follow a circle that grows and shrinks at the real pace of the breath. each phase lands with its own haptic, so it works with your eyes closed.
+lungful is a breathing timer. pick a pattern, press begin, and follow a circle that grows and shrinks at the real pace of the breath. each phase lands with its own soft sound and haptic, so it works with your eyes closed.
 
 the five patterns:
 

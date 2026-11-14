@@ -108,7 +108,7 @@ public final class BreathSessionViewModel: ObservableObject {
             phaseTimeRemaining = pattern.recoveryHoldDuration
             phaseStartDate = .now
             pauseElapsed = 0
-            playPhaseHaptic(.holdIn)
+            playPhaseCue(.holdIn)
         } else {
             completeSession()
         }
@@ -203,12 +203,14 @@ public final class BreathSessionViewModel: ObservableObject {
         phaseTimeRemaining = currentPhaseDuration
         phaseStartDate = date
         pauseElapsed = 0
-        playPhaseHaptic(phase)
+        playPhaseCue(phase)
     }
 
-    // MARK: - Haptics
+    // MARK: - Phase Cues (haptic + sound)
 
-    private func playPhaseHaptic(_ phase: BreathPhase) {
+    /// One cue per phase transition: a haptic (iPhone) and a soft tone (all
+    /// devices — the only non-visual cue on iPad, which has no haptic engine).
+    private func playPhaseCue(_ phase: BreathPhase) {
         #if canImport(UIKit) && !os(macOS)
         switch phase {
         case .inhale:
@@ -222,13 +224,15 @@ public final class BreathSessionViewModel: ObservableObject {
             break
         }
         #endif
+        SoundPlayer.shared.play(phase)
     }
 
-    /// Fire a completion haptic when session ends.
-    private func playCompletionHaptic() {
+    /// Fire completion cues when session ends.
+    private func playCompletionCue() {
         #if canImport(UIKit) && !os(macOS)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         #endif
+        SoundPlayer.shared.playCompletion()
     }
 
     private func advancePhase(at date: Date) {
@@ -249,7 +253,7 @@ public final class BreathSessionViewModel: ObservableObject {
                 phaseTimeRemaining = 0
                 phaseStartDate = date
                 circleScale = 0.35
-                // No haptic — silence IS the hold
+                // No haptic, no sound — silence IS the hold
             } else {
                 completeSession()
             }
@@ -263,7 +267,7 @@ public final class BreathSessionViewModel: ObservableObject {
         isCompletionAnimating = true
         isComplete = true
         stopTimer()
-        playCompletionHaptic()
+        playCompletionCue()
     }
 
     private func reset() {

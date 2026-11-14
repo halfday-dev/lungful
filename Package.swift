@@ -14,7 +14,10 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Lungful"
+            name: "Lungful",
+            resources: [
+                .process("Resources")
+            ]
         ),
         .executableTarget(
             name: "LungfulDemo",

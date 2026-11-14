@@ -15,6 +15,9 @@ public struct BreathSessionView: View {
     @AppStorage("lungful.hasSeenRetentionSafetyNote") private var hasSeenRetentionSafetyNote: Bool = false
     @State private var showSafetyAlert: Bool = false
 
+    /// Phase tones on/off — same key `SoundPlayer` reads at play time.
+    @AppStorage("lungful.soundEnabled") private var soundEnabled: Bool = true
+
     private let pattern: BreathPattern
 
     public init(pattern: BreathPattern) {
@@ -71,6 +74,29 @@ public struct BreathSessionView: View {
                 sessionControls
                     .padding(.bottom, 60)
             }
+
+            // Sound toggle — quiet, top-right, always reachable
+            VStack {
+                HStack {
+                    Spacer()
+
+                    Button {
+                        soundEnabled.toggle()
+                    } label: {
+                        Image(systemName: soundEnabled ? "speaker.wave.2" : "speaker.slash")
+                            .font(.system(size: 16, weight: .light))
+                            .foregroundStyle(Theme.shadow)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(soundEnabled ? "Turn phase sounds off" : "Turn phase sounds on")
+                }
+
+                Spacer()
+            }
+            .padding(.trailing, 8)
+            .padding(.top, 4)
         }
         .onChange(of: viewModel.isComplete) { _, complete in
             if complete {
