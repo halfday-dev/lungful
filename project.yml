@@ -66,3 +66,41 @@ targets:
         DEVELOPMENT_TEAM: RJK97G764H
         SWIFT_VERSION: "5.9"
         ENABLE_USER_SCRIPT_SANDBOXING: true
+
+  # App Store screenshot automation only; not part of the shipped app.
+  LungfulUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: UITests
+    dependencies:
+      - target: LungfulApp
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.halfday.lungful.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: LungfulApp
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: RJK97G764H
+        SWIFT_VERSION: "5.9"
+
+schemes:
+  # The app scheme you run and Archive with. Declared explicitly because a
+  # `schemes:` block stops XcodeGen auto-generating it.
+  LungfulApp:
+    build:
+      targets:
+        LungfulApp: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+  LungfulScreenshots:
+    build:
+      targets:
+        LungfulApp: all
+        LungfulUITests: [test]
+    test:
+      targets:
+        - LungfulUITests
