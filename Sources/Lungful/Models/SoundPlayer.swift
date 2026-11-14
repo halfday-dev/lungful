@@ -1,9 +1,9 @@
 import Foundation
 import AVFoundation
 
-/// Plays the soft phase tones — the audible twin of the haptic language.
-/// Rising tone for inhale, a single strike for the hold, a falling tone for
-/// exhale, and nothing on hold-out: silence IS the instruction, same rule as
+/// Plays the soft phase sounds — the audible twin of the haptic language.
+/// A recorded in-breath for inhale, a single strike for the hold, a recorded
+/// out-breath for exhale, and nothing on hold-out: silence IS the instruction, same rule as
 /// the haptics. Defaults to on — iPads have no haptic engine, so sound is the
 /// only non-visual cue there.
 ///
@@ -53,6 +53,9 @@ public final class SoundPlayer {
 
     // MARK: - Private
 
+    /// Recorded breaths (Pixabay, vikukachannel), split from one in/out clip.
+    private static let breathSounds: Set<String> = ["inhale", "exhale"]
+
     private func play(sound name: String) {
         guard isEnabled else { return }
         configureSessionIfNeeded()
@@ -66,6 +69,13 @@ public final class SoundPlayer {
         }
 
         guard let player = players[name] else { return }
+        // The breath recordings outlast short phases (rapid breathing), so a
+        // new breath cuts off the previous one instead of overlapping it.
+        if Self.breathSounds.contains(name) {
+            for other in Self.breathSounds where other != name {
+                players[other]?.stop()
+            }
+        }
         player.currentTime = 0
         player.play()
     }

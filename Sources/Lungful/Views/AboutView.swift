@@ -106,6 +106,11 @@ public struct AboutView: View {
                             .font(.system(size: 13, weight: .light, design: .default))
                             .foregroundStyle(Theme.shadow)
                             .padding(.top, 4)
+
+                        // Pixabay Content License: credit not required, kept as goodwill.
+                        Text("breath sounds by vikukachannel via Pixabay")
+                            .font(.system(size: 12, weight: .light, design: .default))
+                            .foregroundStyle(Theme.shadow)
                     }
                     .padding(.bottom, 48)
                 }
